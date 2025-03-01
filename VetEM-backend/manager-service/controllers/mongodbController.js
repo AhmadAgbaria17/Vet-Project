@@ -54,7 +54,6 @@ module.exports.mongoLoginUserCtrl = asyncHandler(async (req,res)=>{
       token: response.data.token ,message: response.data.message,
     });
   } catch (error) {
-    console.log("111")
     res.status(500).json({
       message: error.response.data.message,
     });

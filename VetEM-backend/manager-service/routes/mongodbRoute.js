@@ -1,4 +1,4 @@
-const { mongoSignUpUserCtrl, mongoLoginUserCtrl } = require('../controllers/mongodbController');
+const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoGetUserCtrl } = require('../controllers/mongodbController');
 
 const router = require('express').Router();
 

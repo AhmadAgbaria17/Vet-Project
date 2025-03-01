@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View ,Text,StyleSheet, Image,TextInput ,TouchableOpacity} from 'react-native';
+import { View ,Text,StyleSheet, Image,TextInput ,TouchableOpacity,ActivityIndicator } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import Toast from 'react-native-toast-message'; 
 import axios from 'axios';
@@ -13,6 +13,7 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading]=useState(false);
 
     useEffect(() => {
       setEmail("");
@@ -29,9 +30,11 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
       return;
     }
 
+    setLoading(true);
+
     try {
       const response = await axios.post(
-        'http://192.168.10.127:5000/mongodb/auth/login',
+        'http://192.168.10.126:5000/mongodb/auth/login',
         {
           email,
           password,
@@ -48,9 +51,7 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
       })
 
       
-      setTimeout(()=>{
-        navigation.navigate('Home');
-      },3000);
+  
       
     } catch (error:any) {
       
@@ -61,6 +62,9 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
         }
       )
       
+    } finally{
+      navigation.navigate('Home');
+      setLoading(false);
     }
 
   }
@@ -103,8 +107,16 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
       </View>
       
       {/*Login Button*/}
-      <TouchableOpacity onPress={handleLogin} style={styles.loginButton} >
-        <Text style={styles.loginText}>Login</Text>
+      <TouchableOpacity
+       onPress={handleLogin} 
+       style={[styles.loginButton, loading && styles.disabledButton]} 
+       disabled={loading}
+       >
+        {loading? (
+          <ActivityIndicator size="small" color="#fff"/>
+        ): (
+          <Text style={styles.loginText}>Login</Text>
+        )}
       </TouchableOpacity>
 
       {/* Signup & Forgot Password */}
@@ -180,6 +192,9 @@ const styles = StyleSheet.create({
     borderRadius:10,
     alignItems:'center',
     marginTop:10,
+  },
+  disabledButton: {
+    backgroundColor: "#7f8c8d",
   },
   loginText:{
     color:'#fff',

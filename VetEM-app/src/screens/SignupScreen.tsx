@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
-import { View,StyleSheet, Image,Text, TouchableOpacity,TextInput ,ScrollView} from 'react-native';
+import { View,StyleSheet,Text, TouchableOpacity,TextInput ,ScrollView,ActivityIndicator} from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import Toast from 'react-native-toast-message'; 
@@ -16,6 +16,7 @@ const SignupScreen = ({navigation}:any) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userType, setUserType] = useState('client');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [loading, setLoading] = useState(false);
 
 
   useEffect(() => {
@@ -49,6 +50,8 @@ const SignupScreen = ({navigation}:any) => {
       return;
     }
 
+    setLoading(true);
+
     try{
       const response = await axios.post(
         'http://192.168.10.127:5000/mongodb/auth/signup',
@@ -67,10 +70,6 @@ const SignupScreen = ({navigation}:any) => {
         text1:"Account Created",
         text2: response.data.message,
       });
-
-      setTimeout(()=>{
-        navigation.navigate('Login');
-      },3000);
     }catch(error:any){
       console.error("signup error",error);
 
@@ -79,6 +78,9 @@ const SignupScreen = ({navigation}:any) => {
         text1:'Error',
         text2: error.response?.data.message || "An error occurred",
       })
+    }finally{
+      setLoading(false);
+      navigation.navigate('Login');
     }
   }
 
@@ -179,8 +181,15 @@ const SignupScreen = ({navigation}:any) => {
           </Picker>
         </View>
       
-        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
-          <Text style={styles.signupText}>Sign Up</Text>
+        <TouchableOpacity 
+        style={[styles.signupButton, loading&&styles.disabledButton]}
+         onPress={handleSignup}
+         disabled={loading}
+         >
+          {loading?  (
+            <ActivityIndicator size="small" color="#fff"/>
+          ):
+        (<Text style={styles.signupText}>Sign Up</Text>)}
         </TouchableOpacity>
       
         {/* Navigate to Login */}
@@ -268,6 +277,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
+  },
+  disabledButton: {
+    backgroundColor: "#7f8c8d",
   },
   signupText: {
     fontSize: 18,
