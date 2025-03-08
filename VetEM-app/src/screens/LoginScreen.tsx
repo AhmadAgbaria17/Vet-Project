@@ -4,6 +4,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Toast from 'react-native-toast-message'; 
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode"; 
+
 
 interface LoginScreenProps {
   navigation: any,
@@ -14,11 +16,27 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading]=useState(false);
+  const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
       setEmail("");
       setPassword("");
     }, []);
+
+    useEffect(()=>{
+      if(user){
+        if(user.userType === "vet"){
+          navigation.navigate('VetHome');
+        }
+        if(user.userType === "client"){
+          navigation.navigate('ClientHome');
+        }
+        if(user.userType === "admin"){
+          navigation.navigate('AdminHome');
+        }
+  
+      }
+    },[user])
 
   const handleLogin = async ()  => {
     if(!email || !password){
@@ -44,12 +62,16 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
       const token = response.data.token;
       await AsyncStorage.setItem("authToken",token)
 
+      const decodedUser = jwtDecode(token);
+      setUser(decodedUser)
+
+      
+
       Toast.show({
         type:'success',
         text1:"Login Successful",
         text2: response.data.message,
       })
-
       
   
       
@@ -62,8 +84,7 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
         }
       )
       
-    } finally{
-      navigation.navigate('Home');
+    } finally{  
       setLoading(false);
     }
 

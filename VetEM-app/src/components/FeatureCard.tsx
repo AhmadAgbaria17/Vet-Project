@@ -3,6 +3,7 @@ import {  Text, TouchableOpacity, StyleSheet} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface FeatureCardProps {
+  user:any,
   navigation: any,
   pathName: string|undefined,
   iconName: any,
@@ -11,11 +12,11 @@ interface FeatureCardProps {
   textCard: string,
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ navigation , pathName , iconName, iconColor,textTitle,textCard }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({user, navigation , pathName , iconName, iconColor,textTitle,textCard }) => {
   return (
     <TouchableOpacity
       style={styles.featureCard}
-      onPress={() => navigation.navigate(pathName)}
+      onPress={() => navigation.navigate(pathName, {user})}
     >
       <Ionicons name={iconName} size={40} color={iconColor} />
       <Text style={styles.featureTitle}>{textTitle}</Text>

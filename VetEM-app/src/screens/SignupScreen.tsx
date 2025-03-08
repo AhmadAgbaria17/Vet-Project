@@ -54,7 +54,7 @@ const SignupScreen = ({navigation}:any) => {
 
     try{
       const response = await axios.post(
-        'http://192.168.10.127:5000/mongodb/auth/signup',
+        'http://192.168.10.126:5000/mongodb/auth/signup',
         {
           firstName,
           lastName,
@@ -86,7 +86,7 @@ const SignupScreen = ({navigation}:any) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.empyHeader}>
+      <View style={styles.emptyHeader}>
       <Toast position='top' />
       </View>
       <ScrollView >
@@ -207,7 +207,7 @@ const SignupScreen = ({navigation}:any) => {
 }
 
 const styles = StyleSheet.create({
-  empyHeader:{
+  emptyHeader:{
     height:30,
     zIndex:1,
   },

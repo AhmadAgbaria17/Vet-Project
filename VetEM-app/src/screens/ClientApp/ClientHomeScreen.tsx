@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
-import Header from '../components/Header';
-import FeatureCard from '../components/FeatureCard';
+import Header from '../../components/Header';
+import FeatureCard from '../../components/FeatureCard';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode"; 
 
-interface HomeScreenProps {
+interface ClientHomeScreenProps {
   navigation: any,
 }
 
-const HomeScreen = ({navigation}:HomeScreenProps) => {
+const ClientHomeScreen = ({navigation}:ClientHomeScreenProps) => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(()=>{
@@ -38,7 +38,9 @@ const HomeScreen = ({navigation}:HomeScreenProps) => {
 
       <ScrollView>
         {/*welcome section*/}
+        
         <View  style={styles.welcomeSection} >
+          <Text>CLient APP</Text>
           <Text onPress={()=> navigation.navigate('Clinics')} style={styles.welcomeTitle} >
             Welcome {user ? `Dr.${user.firstName}`:"!"}!
             </Text>
@@ -137,4 +139,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default ClientHomeScreen;

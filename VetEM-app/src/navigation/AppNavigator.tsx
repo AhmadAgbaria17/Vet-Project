@@ -2,11 +2,13 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import HomeScreen from '../screens/HomeScreen';
-import ClinicsScreen from '../screens/ClinicsScreen';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
+import VetHomeScreen from '../screens/VetApp/VetHomeScreen';
+import ClientHomeScreen from '../screens/ClientApp/ClientHomeScreen';
+import AdminHomeScreen from '../screens/AdminApp/AdminHomeScreen';
+import VetClinicsScreen from '../screens/VetApp/VetClincsScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -33,9 +35,14 @@ const AppNavigator = () => {
         >
           <Drawer.Screen name="Login" component={LoginScreen} />
           <Drawer.Screen name="Signup" component={SignupScreen} />
-          <Drawer.Screen name="Home" component={HomeScreen} />
+          <Drawer.Screen name="AdminHome" component={AdminHomeScreen} />
+          <Drawer.Screen name="VetHome" component={VetHomeScreen} />
+          <Drawer.Screen name="ClientHome" component={ClientHomeScreen} />
+          <Drawer.Screen name="VetClinics" component={VetClinicsScreen} />
+
+
+
           
-          <Drawer.Screen name="Clinics" component={ClinicsScreen} />
         </Drawer.Navigator>
     </NavigationContainer>
   );

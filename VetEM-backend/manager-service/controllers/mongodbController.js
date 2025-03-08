@@ -1,5 +1,5 @@
+const axios = require("axios");
 const asyncHandler = require("express-async-handler");
-axios = require('axios');
 
 
 
@@ -63,4 +63,33 @@ module.exports.mongoLoginUserCtrl = asyncHandler(async (req,res)=>{
 
 module.exports.mongoGetUserCtrl = asyncHandler(async (req,res)=>{
   
+})
+
+
+
+
+/**
+ * @desc send to mongodb accessor service to add clinic
+ * @route mongodb/clinic/add
+ * @method Post
+ * @access public
+ */
+module.exports.mongoAddClinicCtrl = asyncHandler(async (req,res)=>{
+  const {name, openTime, location, userId} = req.body;
+  try {
+    const respone = await axios.post('http://localhost:5001/clinic/add',{
+      name,
+      openTime,
+      location,
+      userId
+    })
+    res.status(200).json({
+      message: respone.data.message
+      })
+    
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message
+      })
+  }
 })

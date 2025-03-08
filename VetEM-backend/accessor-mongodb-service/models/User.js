@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const Joi = require("joi");
+const { Schema } = mongoose;
 
-
-const UserSchema = new mongoose.Schema
+const UserSchema = new Schema
 (
   {
     firstName:{
@@ -26,7 +26,8 @@ const UserSchema = new mongoose.Schema
     },
     userType:{
       type: String,
-      enum: ['client', 'admin'],
+      enum: ['client', 'vet' , 'admin'],
+      require:true,
     },
     isAccountVerified:{
       type: Boolean,
@@ -35,6 +36,12 @@ const UserSchema = new mongoose.Schema
     accountVerificationToken:{
       type: String,
     },
+    clinics: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Clinic',
+      }
+    ]
   },
   {timestamps: true,}
 );
@@ -51,6 +58,7 @@ function validateRegisterUser(user){
     lastName: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
+    userType: Joi.string().valid('client', 'vet', 'admin').required(),
   });
   return schema.validate(user);
 }
