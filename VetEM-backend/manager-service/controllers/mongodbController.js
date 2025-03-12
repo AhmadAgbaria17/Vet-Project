@@ -70,21 +70,55 @@ module.exports.mongoGetUserCtrl = asyncHandler(async (req,res)=>{
 
 /**
  * @desc send to mongodb accessor service to add clinic
- * @route mongodb/clinic/add
+ * @route mongodb/clinic
  * @method Post
- * @access public
+ * @access private
  */
 module.exports.mongoAddClinicCtrl = asyncHandler(async (req,res)=>{
   const {name, openTime, location, userId} = req.body;
+  const authToken = req.header("Authorization");
   try {
-    const respone = await axios.post('http://localhost:5001/clinic/add',{
+    const respone = await axios.post('http://localhost:5001/clinic/home',
+    {
       name,
       openTime,
       location,
       userId
-    })
+    },
+    {
+      headers:{
+        "Authorization":authToken
+      }
+    }
+  )
     res.status(200).json({
-      message: respone.data.message
+      message: respone.data.message,
+      clinic: respone.data.clinic
+      })
+    
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message
+      })
+  }
+})
+
+
+
+/**
+ * @desc get all the clinics of the user 
+ * @route mongodb/clinic/:userId
+ * @method Get
+ * @access private
+ */
+module.exports.mongoGetAllUserClinicsCtrl = asyncHandler(async (req,res)=>{
+  try {
+    const userId = req.params.userId;
+    
+    const respone = await axios.get(`http://localhost:5001/clinic/home/${userId}`)
+    res.status(200).json({
+      message: respone.data.message,
+      UserClinics: respone.data.UserClinics
       })
     
   } catch (error) {

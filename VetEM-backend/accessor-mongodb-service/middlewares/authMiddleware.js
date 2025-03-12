@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
 
 
-const authMiddleware = (req,res,next) =>{
-  const token = req.header("Authorization");
-  if(!token){
+const verifyToken = (req,res,next) =>{
+  const authToken = req.header("Authorization");
+  if(!authToken){
     return res.status(401).send("Access denied. No token provided.");
   }
-
+  const token = authToken.split(' ')[1]
   try {
     const verified = jwt.verify(token, process.env.JWT_SECRET);
     req.user = verified;
@@ -18,6 +18,6 @@ const authMiddleware = (req,res,next) =>{
 
 module.exports =
 {
-  authMiddleware,
+  verifyToken,
   
 }

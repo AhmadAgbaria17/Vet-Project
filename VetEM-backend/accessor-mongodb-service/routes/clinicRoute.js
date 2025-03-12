@@ -1,10 +1,15 @@
-const { addClinic } = require('../controllers/clinicController');
+const { addClinic, getAllClincs } = require('../controllers/clinicController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 
 const router = require('express').Router();
 
-// /clinic/add
-router.route("/add")
-.post(addClinic);
+// /clinic/home
+router.route("/home")
+.post(verifyToken,addClinic);
+
+// /clinics/home/:userId
+router.route("/home/:userId")
+.get(getAllClincs)
 
 
 

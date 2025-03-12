@@ -60,7 +60,7 @@ const VetClinicsScreen = ({route}:any) => {
   
     try {
       const response = await axios.post(
-        'http://192.168.10.126:5000/mongodb/clinic/add',
+        'http://192.168.10.126:5000/mongodb/clinic/home',
         newClinic
       );
 

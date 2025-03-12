@@ -1,4 +1,4 @@
-const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoGetUserCtrl, mongoAddClinicCtrl } = require('../controllers/mongodbController');
+const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllClinicsCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl } = require('../controllers/mongodbController');
 
 const router = require('express').Router();
 
@@ -10,12 +10,15 @@ router.route('/auth/signup')
 router.route('/auth/login')
 .post(mongoLoginUserCtrl)
 
-// /mongodb/user/profile
-router.route('/user/profile')
+// /mongodb/user
+router.route('/user')
 .get(mongoGetUserCtrl)
 
-// /mongodb/clinic/add
-router.route('/clinic/add')
+// /mongodb/clinic
+router.route('/clinic')
 .post(mongoAddClinicCtrl)
+
+router.route('/clinic/:userId')
+.get(mongoGetAllUserClinicsCtrl)
 
 module.exports = router;

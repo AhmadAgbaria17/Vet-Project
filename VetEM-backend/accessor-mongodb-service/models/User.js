@@ -36,13 +36,13 @@ const UserSchema = new Schema
     accountVerificationToken:{
       type: String,
     },
-    clinics: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Clinic',
-      }
-    ]
-  },
+      clinics: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Clinic',
+        }
+      ]
+    },
   {timestamps: true,}
 );
 

@@ -42,16 +42,21 @@ module.exports.signUpUserCtrl = asyncHandler(async (req,res)=>{
     //Generate verification token
     const accountVerificationToken = crypto.randomBytes(32).toString("hex");
 
+    //change email to lower case 
+    const emailLower = email.toLowerCase();
+
     //create user
     const newUser = new User({
       firstName,
       lastName,
-      email,
+      email:emailLower,
       password:hashedPassword,
       userType,
       accountVerificationToken,
       isAccountVerified: false,
     });
+
+    //make email lower case?
 
     await newUser.save();
 
@@ -85,8 +90,11 @@ module.exports.loginUserCtrl = asyncHandler(async (req, res) => {
   try {
     const {email, password} = req.body;
 
+    //change email to lower case 
+    const emailLower = email.toLowerCase();
+
     //check if user exists
-    const user = await User.findOne({email});
+    const user = await User.findOne({email:emailLower});
 
     if(!user){
       return res.status(400).json({message: "Invalid email or password"});
