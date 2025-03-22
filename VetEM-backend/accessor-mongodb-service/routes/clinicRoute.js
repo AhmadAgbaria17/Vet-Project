@@ -1,15 +1,20 @@
-const { addClinic, getAllClincs } = require('../controllers/clinicController');
+const { addClinic, getAllClincs, updateClinic, deleteClinic } = require('../controllers/clinicController');
 const { verifyToken } = require('../middlewares/authMiddleware');
 
 const router = require('express').Router();
 
-// /clinic/home
-router.route("/home")
+// /clinic
+router.route("")
 .post(verifyToken,addClinic);
 
-// /clinics/home/:userId
-router.route("/home/:userId")
+// /clinic/:userId
+router.route("/:userId")
 .get(getAllClincs)
+
+// /clinic/item/:clinicId
+router.route("/item/:clinicId")
+.put(verifyToken,updateClinic)
+.delete(verifyToken,deleteClinic)
 
 
 

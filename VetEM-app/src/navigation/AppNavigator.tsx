@@ -8,7 +8,7 @@ import SignupScreen from '../screens/SignupScreen';
 import VetHomeScreen from '../screens/VetApp/VetHomeScreen';
 import ClientHomeScreen from '../screens/ClientApp/ClientHomeScreen';
 import AdminHomeScreen from '../screens/AdminApp/AdminHomeScreen';
-import VetClinicsScreen from '../screens/VetApp/VetClincsScreen';
+import VetClinicsScreen from '../screens/VetApp/ClinicsFeature/VetClincsScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -36,9 +36,12 @@ const AppNavigator = () => {
           <Drawer.Screen name="Login" component={LoginScreen} />
           <Drawer.Screen name="Signup" component={SignupScreen} />
           <Drawer.Screen name="AdminHome" component={AdminHomeScreen} />
+
           <Drawer.Screen name="VetHome" component={VetHomeScreen} />
-          <Drawer.Screen name="ClientHome" component={ClientHomeScreen} />
           <Drawer.Screen name="VetClinics" component={VetClinicsScreen} />
+          
+          
+          <Drawer.Screen name="ClientHome" component={ClientHomeScreen} />
 
 
 

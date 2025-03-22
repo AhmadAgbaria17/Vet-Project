@@ -64,7 +64,30 @@ function validateClinic(clinic) {
   return schema.validate(clinic);
 }
 
+
+function validateUpdateClinic(clinic) {
+  const schema = Joi.object({
+    name: Joi.string(),
+    openTime: Joi.string()
+      .pattern(/^\d{2}:\d{2}-\d{2}:\d{2}$/)
+      .required()
+      .messages({
+        "string.pattern.base": "Invalid openTime format. Use HH:MM-HH:MM (e.g., 14:00-19:00)"
+      }),
+    location: Joi.object()
+      .keys({
+        latitude: Joi.number(),
+        longitude: Joi.number()
+      })
+      ,
+    userId: Joi.string()
+  });
+  
+  return schema.validate(clinic);
+}
+
 module.exports = {
   Clinic,
-  validateClinic
+  validateClinic,
+  validateUpdateClinic
 }

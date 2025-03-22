@@ -17,7 +17,7 @@ connectToDB();
 // /auth/signup
 app.use('/auth', require('./routes/authRoute'));
 
-// /clinic/home
+// /clinic/
 app.use('/clinic', require('./routes/clinicRoute'));
 
 
