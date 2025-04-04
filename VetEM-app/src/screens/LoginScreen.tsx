@@ -9,34 +9,19 @@ import { jwtDecode } from "jwt-decode";
 
 interface LoginScreenProps {
   navigation: any,
+  setIsLoggedIn: (value: boolean) => void;
 }
 
-const LoginScreen = ({navigation}:LoginScreenProps) => {
+const LoginScreen = ({navigation,setIsLoggedIn}:LoginScreenProps) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading]=useState(false);
-  const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
       setEmail("");
       setPassword("");
     }, []);
-
-    useEffect(()=>{
-      if(user){
-        if(user.userType === "vet"){
-          navigation.navigate('VetHome');
-        }
-        if(user.userType === "client"){
-          navigation.navigate('ClientHome');
-        }
-        if(user.userType === "admin"){
-          navigation.navigate('AdminHome');
-        }
-  
-      }
-    },[user])
 
   const handleLogin = async ()  => {
     if(!email || !password){
@@ -47,9 +32,7 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
       });
       return;
     }
-
     setLoading(true);
-
     try {
       const response = await axios.post(
         'http://192.168.10.126:5000/mongodb/auth/login',
@@ -61,12 +44,13 @@ const LoginScreen = ({navigation}:LoginScreenProps) => {
 
       const token = response.data.token;
       await AsyncStorage.setItem("authToken",token)
-
       const decodedUser = jwtDecode(token);
-      setUser(decodedUser)
+      if(decodedUser){
+        setIsLoggedIn(true);
+      }
+      //wait 1 second 
 
-      
-
+      await new Promise(resolve => setTimeout(resolve, 1000));    
       Toast.show({
         type:'success',
         text1:"Login Successful",

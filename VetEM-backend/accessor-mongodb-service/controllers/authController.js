@@ -56,7 +56,6 @@ module.exports.signUpUserCtrl = asyncHandler(async (req,res)=>{
       isAccountVerified: false,
     });
 
-    //make email lower case?
 
     await newUser.save();
 

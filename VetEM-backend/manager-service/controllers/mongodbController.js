@@ -25,7 +25,7 @@ module.exports.mongoSignUpUserCtrl = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: error.response.data.message,
-    });
+    }); 
   }
 });
 
@@ -65,7 +65,6 @@ module.exports.mongoGetUserCtrl = asyncHandler(async (req, res) => {});
 module.exports.mongoAddClinicCtrl = asyncHandler(async (req, res) => {
   const { name, openTime, location, userId } = req.body;
   const authToken = req.header("Authorization");
-  console.log(openTime)
   try {
     const respone = await axios.post(
       "http://localhost:5001/clinic",
@@ -113,6 +112,8 @@ module.exports.mongoGetAllUserClinicsCtrl = asyncHandler(async (req, res) => {
     });
   }
 });
+
+
 
 /**
  * @desc update one vet clinic

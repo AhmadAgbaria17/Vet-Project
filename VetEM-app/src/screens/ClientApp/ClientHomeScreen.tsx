@@ -51,32 +51,7 @@ const ClientHomeScreen = ({navigation}:ClientHomeScreenProps) => {
     
         {/*Assists Cards*/}
         <View style={styles.featuresSection}>
-          <FeatureCard 
-          navigation={navigation} 
-          pathName={"Clinics"}
-          iconName={'location-outline'}
-          iconColor={"#3498db"}
-          textTitle={"Nearby Clinics"}
-          textCard={"Locate vets near you"}
-          />
-
-          <FeatureCard 
-          navigation={navigation} 
-          pathName={""}
-          iconName={'call-outline'}
-          iconColor={"#e74c3c"}
-          textTitle={"Emergency Contacts"}
-          textCard={"Access 24/7 helplines"}
-          />
-
-          <FeatureCard 
-          navigation={navigation} 
-          pathName={""}
-          iconName={'book-outline'}
-          iconColor={"#2ecc71"}
-          textTitle={"Pet Care Tips"}
-          textCard={"Learn how to care for your pet"}
-          />
+        
           
         </View>
 

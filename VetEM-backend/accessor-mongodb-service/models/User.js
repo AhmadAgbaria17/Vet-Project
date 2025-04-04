@@ -27,7 +27,7 @@ const UserSchema = new Schema
     userType:{
       type: String,
       enum: ['client', 'vet' , 'admin'],
-      require:true,
+      required:true,
     },
     isAccountVerified:{
       type: Boolean,
@@ -36,13 +36,20 @@ const UserSchema = new Schema
     accountVerificationToken:{
       type: String,
     },
+
+    vetInfo:{
       clinics: [
         {
           type: Schema.Types.ObjectId,
           ref: 'Clinic',
-        }
-      ]
+        },
+      ],
     },
+
+    clientInfo:{
+    },
+    
+  },
   {timestamps: true,}
 );
 

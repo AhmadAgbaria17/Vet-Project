@@ -1,13 +1,39 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // To manage login status
+
 
 interface CustomDrawerContentProps {
-  User: any,
+  userId: string,
   navigation: any,
+  setIsLoggedIn: (value: boolean) => void;
 }
 
-const CustomDrawerContent = ({User, navigation}:CustomDrawerContentProps) => {
+interface User {
+  name: string;
+  email: string;
+  profileImg: string;
+}
+
+const CustomDrawerContent = ({userId, navigation,setIsLoggedIn}:CustomDrawerContentProps) => {
+
+  const [User, setUser] = React.useState<User>({
+    name: 'Ahmad',
+    email: 'ah.agbaria.99@gmail.com',
+    profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+  })
+
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("authToken");
+      setIsLoggedIn(false);     
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   return (
 
     <View style={styles.drawerContainer}>
@@ -36,6 +62,11 @@ const CustomDrawerContent = ({User, navigation}:CustomDrawerContentProps) => {
       >
         <Ionicons name="call-outline" size={24} color="black" style={styles.drawerOptionIcon} />
         <Text style={styles.drawerOptionText}>About Us</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={()=>handleLogout()} >
+        <Text>Logout</Text>
+
       </TouchableOpacity>
     </View>
   )

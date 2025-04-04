@@ -17,7 +17,6 @@ module.exports.addClinic = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
     const {name, openTime,location,userId} = req.body;
-    console.log("Open Time:", openTime);
     const user= await User.findById(userId);
     if(!user){
       return res.status(404).json({ message: "User not found" });
@@ -29,7 +28,7 @@ module.exports.addClinic = asyncHandler(async (req, res) => {
       userId,
     })
     await User.findByIdAndUpdate(userId, 
-      {$push: {clinics: newClinic._id }},
+      {$push: { 'vetInfo.clinics': newClinic._id }},
       {new: true},
     );
     res.status(201).json({
@@ -99,7 +98,7 @@ module.exports.deleteClinic = asyncHandler(async (req, res) => {
       await Clinic.findByIdAndDelete(clinicId);
       await User.findByIdAndUpdate(
         userId,
-        {$pull: {clinics: clinicId}},
+        {$pull: {'vetInfo.clinics': clinicId}},
         {new : true}
       );
       res.status(200).json({ message: "Clinic deleted successfully" });
@@ -124,11 +123,15 @@ module.exports.getAllClincs = asyncHandler(async (req, res) => {
       return res.status(400).json({message:"invalid id"})
   }
 
-    const user = await User.findById(userId).populate("clinics");
+    const user = await User.findById(userId).populate({
+      path: 'vetInfo.clinics',
+      select:'-userId -__v',
+    });
+  
 
     res.status(201).json({
        message: "got all the clinics Successfully",
-       UserClinics:user.clinics,
+       UserClinics:user.vetInfo.clinics,
   
       });
   } catch (error) {
