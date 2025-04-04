@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage'; // To manage login status
@@ -11,18 +11,39 @@ interface CustomDrawerContentProps {
 }
 
 interface User {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   profileImg: string;
 }
 
 const CustomDrawerContent = ({userId, navigation,setIsLoggedIn}:CustomDrawerContentProps) => {
 
-  const [User, setUser] = React.useState<User>({
-    name: 'Ahmad',
-    email: 'ah.agbaria.99@gmail.com',
-    profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
-  })
+  const [user, setUser] = React.useState<User|null>(null);
+
+
+  useEffect(()=>{
+    const fetchUserInfo = async () =>{
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if(!token) return;
+
+        const respone = await fetch(`http://192.168.10.126:5000/mongodb/user/${userId}`,{
+          method:"GET",
+          headers:{
+            "Content-Type":"application/json",
+            "Authorization":`Bearer ${token}`
+          }
+      });
+      const data = await respone.json();  
+      setUser(data.user);                
+      } catch (error) {
+        console.error("Error getting user info:", error);
+      }
+
+    }
+    fetchUserInfo();
+  },[])
 
 
   const handleLogout = async () => {
@@ -40,14 +61,23 @@ const CustomDrawerContent = ({userId, navigation,setIsLoggedIn}:CustomDrawerCont
       {/* Profile Section */}
       <View style={styles.drawerProfileView}>
         <Image
-          source={{ uri: User.profileImg }}
+          source={{ uri: user?.profileImg }}
           style={styles.drawerProfileImg}
         />
-        <Text style={styles.drwerProfieName}>{User.name}</Text>
-        <Text style={styles.drawerProfileEmail}>{User.email}</Text>
+        <Text style={styles.drwerProfieName}>{user?.firstName} {user?.lastName}</Text>
+        <Text style={styles.drawerProfileEmail}>{user?.email}</Text>
       </View>
 
       {/* Drawer Options */}
+
+      <TouchableOpacity
+        style={styles.drawerOption}
+        onPress={() => navigation.navigate("Contact")}
+      >
+        <Ionicons name="person-circle-outline" size={24} color="black" style={styles.drawerOptionIcon} />
+        <Text style={styles.drawerOptionText}>Edit Profile</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.drawerOption}
         onPress={() => navigation.navigate("Contact")}
@@ -60,13 +90,14 @@ const CustomDrawerContent = ({userId, navigation,setIsLoggedIn}:CustomDrawerCont
         style={styles.drawerOption}
         onPress={() => navigation.navigate("About-us")}
       >
-        <Ionicons name="call-outline" size={24} color="black" style={styles.drawerOptionIcon} />
+        <Ionicons name="people-outline" size={24} color="black" style={styles.drawerOptionIcon} />
         <Text style={styles.drawerOptionText}>About Us</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={()=>handleLogout()} >
+      <TouchableOpacity 
+      style={styles.logOutBTN}
+      onPress={()=>handleLogout()} >
         <Text>Logout</Text>
-
       </TouchableOpacity>
     </View>
   )
@@ -106,6 +137,17 @@ const styles = StyleSheet.create({
   drawerOptionText:{
     fontSize:16,
   },
+  logOutBTN:{
+    backgroundColor:'#e74c3c',
+    alignItems:'center',
+    padding:10,
+    borderRadius:10,
+    justifyContent:'center',
+    position:'absolute',
+    bottom:20,
+    left:20,
+    right:20,
+  }
 })
 
 

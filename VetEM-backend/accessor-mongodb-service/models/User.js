@@ -29,6 +29,10 @@ const UserSchema = new Schema
       enum: ['client', 'vet' , 'admin'],
       required:true,
     },
+    profileImg:{
+      type: String,
+      default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+    },
     isAccountVerified:{
       type: Boolean,
       default: false,
@@ -36,6 +40,7 @@ const UserSchema = new Schema
     accountVerificationToken:{
       type: String,
     },
+
 
     vetInfo:{
       clinics: [

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text,  StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text,  StyleSheet, Image, ScrollView,ActivityIndicator } from 'react-native';
 import Header from '../../components/Header';
 import FeatureCard from '../../components/FeatureCard';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,18 +9,28 @@ interface VetHomeScreenProps {
   navigation: any,
 }
 
-const VetHomeScreen = ({navigation}:VetHomeScreenProps) => {
-  const [user, setUser] = useState<any>(null);
+interface User {
+  firstName: string;
+  userId: string;
+  userType: 'client' | 'vet' | 'admin';
+}
 
-  useEffect(()=>{
+const VetHomeScreen = ({navigation}:VetHomeScreenProps) => {
+  const [user, setUser] = useState<User|null>(null)
+  const [loading, setLoading] = useState(false);
+
+useEffect(()=>{
     const fetchUserInfo =async()=>{
       try {
+        setLoading(true);
         const token = await AsyncStorage.getItem("authToken");
         if(!token) return;
-        const decodedUser = jwtDecode(token);
+        const decodedUser = jwtDecode(token) as User;
         setUser(decodedUser)
       } catch (error) {
         console.error("Error getting user info:", error);
+      }finally{
+        setLoading(false);
       }
     }
     fetchUserInfo();
@@ -29,75 +39,82 @@ const VetHomeScreen = ({navigation}:VetHomeScreenProps) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <Header navigation={navigation}/>
-
-      <ScrollView>
-        {/*welcome section*/}
-        <View  style={styles.welcomeSection} >
-          <Text  style={styles.welcomeTitle} >
-            Welcome {user ? `Dr.${user.firstName}`:"Veterinarian"}!
+      {loading ? (
+        <ActivityIndicator size="small" color="#fff"/>
+      ):
+      (
+    <View>
+        <Header navigation={navigation}/>
+      
+        <ScrollView>
+          {/*welcome section*/}
+          <View  style={styles.welcomeSection} >
+            <Text  style={styles.welcomeTitle} >
+              Welcome {user ? `Dr.${user.firstName}`:"Veterinarian"}!
+              </Text>
+            <Text style={styles.welcomeSubtitle} >
+            Manage your clinics, customers, and veterinary services.
             </Text>
-          <Text style={styles.welcomeSubtitle} >
-          Manage your clinics, customers, and veterinary services.
-          </Text>
-        </View>
-    
-        {/*Assists Cards*/}
-        <View style={styles.featuresSection}>
-          <FeatureCard 
-          user={user}
-          navigation={navigation} 
-          pathName={"VetClinics"}
-          iconName={'business-outline'}
-          iconColor={"#3498db"}
-          textTitle={"My Clinics"}
-          textCard={"Manage your assigned clinics"}
-          />
-
-          <FeatureCard 
-          user={user}
-          navigation={navigation} 
-          pathName={"VetCustomers"}
-          iconName={'people-outline'}
-          iconColor={"#27ae60"}
-          textTitle={"My Customers"}
-          textCard={"View and assist pet owners"}
-          />
-
-          <FeatureCard
-          user={user} 
-          navigation={navigation} 
-          pathName={"VetQnA"}
-          iconName={'chatbubbles-outline'}
-          iconColor={"#f39c12"}
-          textTitle={"Q&A"}
-          textCard={"Answer pet health questions"}
-          />
-
-          <FeatureCard
-            user={user} 
-            navigation={navigation} 
-            pathName={"Appointments"}
-            iconName={'calendar-outline'}
-            iconColor={"#9b59b6"}
-            textTitle={"Appointments"}
-            textCard={"Manage scheduled visits"}
-          />
-
-          <FeatureCard 
+          </View>
+      
+          {/*Assists Cards*/}
+          <View style={styles.featuresSection}>
+            <FeatureCard 
             user={user}
             navigation={navigation} 
-            pathName={"MedicalRecords"}
-            iconName={'document-text-outline'}
-            iconColor={"#e74c3c"}
-            textTitle={"Medical Records"}
-            textCard={"Access pet medical histories"}
-          />
-          
-        </View>
-
-      </ScrollView>
+            pathName={"VetClinics"}
+            iconName={'business-outline'}
+            iconColor={"#3498db"}
+            textTitle={"My Clinics"}
+            textCard={"Manage your assigned clinics"}
+            />
+      
+            <FeatureCard 
+            user={user}
+            navigation={navigation} 
+            pathName={"VetCustomers"}
+            iconName={'people-outline'}
+            iconColor={"#27ae60"}
+            textTitle={"My Customers"}
+            textCard={"View and assist pet owners"}
+            />
+      
+            <FeatureCard
+            user={user} 
+            navigation={navigation} 
+            pathName={"VetQnA"}
+            iconName={'chatbubbles-outline'}
+            iconColor={"#f39c12"}
+            textTitle={"Q&A"}
+            textCard={"Answer pet health questions"}
+            />
+      
+            <FeatureCard
+              user={user} 
+              navigation={navigation} 
+              pathName={"Appointments"}
+              iconName={'calendar-outline'}
+              iconColor={"#9b59b6"}
+              textTitle={"Appointments"}
+              textCard={"Manage scheduled visits"}
+            />
+      
+            <FeatureCard 
+              user={user}
+              navigation={navigation} 
+              pathName={"MedicalRecords"}
+              iconName={'document-text-outline'}
+              iconColor={"#e74c3c"}
+              textTitle={"Medical Records"}
+              textCard={"Access pet medical histories"}
+            />
+            
+          </View>
+      
+        </ScrollView>
+    </View>
+    
+      )}
     
     </View>
   );

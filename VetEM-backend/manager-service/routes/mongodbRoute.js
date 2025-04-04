@@ -10,8 +10,8 @@ router.route('/auth/signup')
 router.route('/auth/login')
 .post(mongoLoginUserCtrl)
 
-// /mongodb/user
-router.route('/user')
+// /mongodb/user/:userId
+router.route('/user/:userId')
 .get(mongoGetUserCtrl)
 
 // /mongodb/clinic

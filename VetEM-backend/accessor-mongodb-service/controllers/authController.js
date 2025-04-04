@@ -124,6 +124,9 @@ module.exports.loginUserCtrl = asyncHandler(async (req, res) => {
 })
 
 
+
+
+
 /**
  * @desc verify email
  * @route /auth/verify-email

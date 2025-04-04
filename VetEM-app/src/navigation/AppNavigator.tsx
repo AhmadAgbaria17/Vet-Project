@@ -62,11 +62,9 @@ const AppNavigator = () => {
   }, [])
 
   if(loading) {
-    return null
-    
+    return null 
   }
-
-
+  
   return (
     <NavigationContainer>
       {isLoggedIn ? (

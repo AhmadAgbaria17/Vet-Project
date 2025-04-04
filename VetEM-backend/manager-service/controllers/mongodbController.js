@@ -54,7 +54,31 @@ module.exports.mongoLoginUserCtrl = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports.mongoGetUserCtrl = asyncHandler(async (req, res) => {});
+/**
+ * @desc send to mongodb accessor service get user by id
+ * @route mongodb/user/:userId
+ * @method get
+ * @access private
+ */
+module.exports.mongoGetUserCtrl = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const authToken = req.header("Authorization");
+  try {
+    const response = await axios.get(`http://localhost:5001/user/${userId}`, {
+      headers: {
+        Authorization: authToken,
+      },
+    });
+    res.status(200).json({
+      message: response.data.message,
+      user: response.data.user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+});
 
 /**
  * @desc send to mongodb accessor service to add clinic

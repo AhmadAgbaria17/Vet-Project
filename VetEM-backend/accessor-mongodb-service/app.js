@@ -20,6 +20,9 @@ app.use('/auth', require('./routes/authRoute'));
 // /clinic/
 app.use('/clinic', require('./routes/clinicRoute'));
 
+// /user/
+app.use('/user', require('./routes/userRoute'));
+
 
 
 
