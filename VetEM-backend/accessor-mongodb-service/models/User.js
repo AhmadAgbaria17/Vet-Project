@@ -19,6 +19,12 @@ const UserSchema = new Schema
       unique: true,
       match: [/\S+@\S+\.\S+/, "Invalid email format"],
     },
+    phone:{
+      type: String,
+      required: [true, 'Please provide your phone number'],
+      unique: true,
+      match: [/^\d{10}$/, "Invalid phone number format"],
+    },
     password:{
       type: String,
       required: [true, 'Please provide your password'],
@@ -49,9 +55,33 @@ const UserSchema = new Schema
           ref: 'Clinic',
         },
       ],
+      vetClients:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+        },
+      ],
+      vetClientRequests:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+        },
+      ],
+      vetClientWaitApproval:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+        },
+      ],
     },
 
     clientInfo:{
+      pets: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Pet',
+        },
+      ],
     },
     
   },

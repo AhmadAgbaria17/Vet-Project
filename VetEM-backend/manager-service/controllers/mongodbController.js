@@ -8,13 +8,14 @@ const asyncHandler = require("express-async-handler");
  * @access public
  */
 module.exports.mongoSignUpUserCtrl = asyncHandler(async (req, res) => {
-  const { firstName, lastName, email, password, userType } = req.body;
+  const { firstName, lastName, email,phone, password, userType } = req.body;
 
   try {
     const response = await axios.post("http://localhost:5001/auth/signup", {
       firstName,
       lastName,
       email,
+      phone,
       password,
       userType,
     });

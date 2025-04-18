@@ -72,7 +72,7 @@ useEffect(()=>{
             <FeatureCard 
             user={user}
             navigation={navigation} 
-            pathName={"VetCustomers"}
+            pathName={"vetCustomers"}
             iconName={'people-outline'}
             iconColor={"#27ae60"}
             textTitle={"My Customers"}

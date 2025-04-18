@@ -12,6 +12,8 @@ import AdminHomeScreen from '../screens/AdminApp/AdminHomeScreen';
 import VetClinicsScreen from '../screens/VetApp/ClinicsFeature/VetClincsScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import { jwtDecode } from "jwt-decode"; 
+import VetCustomresScreen from '../screens/VetApp/CustomersFeature/VetCustomresScreen';
+import VetAddCustomerScreen from '../screens/VetApp/CustomersFeature/VetAddCustomerScreen';
 
 
 const Drawer = createDrawerNavigator();
@@ -86,6 +88,9 @@ const AppNavigator = () => {
             <>
                 <Drawer.Screen name="VetHome" component={VetHomeScreen} />
                 <Drawer.Screen name="VetClinics" component={VetClinicsScreen} />
+                <Drawer.Screen name="vetCustomers" component={VetCustomresScreen}/>
+                <Drawer.Screen name="VetAddCustomerScreen" component={VetAddCustomerScreen}/>
+              
             </>
           )}
 

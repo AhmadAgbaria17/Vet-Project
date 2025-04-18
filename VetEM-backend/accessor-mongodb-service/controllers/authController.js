@@ -27,7 +27,7 @@ const transport = nodeMailer.createTransport({
  */
 module.exports.signUpUserCtrl = asyncHandler(async (req,res)=>{
   try {
-    const {firstName,lastName,email,password, userType} = req.body;
+    const {firstName,lastName,email,phone,password, userType} = req.body;
 
     //checek if user exists
     const existingUser = await User.findOne({email});
@@ -50,14 +50,22 @@ module.exports.signUpUserCtrl = asyncHandler(async (req,res)=>{
       firstName,
       lastName,
       email:emailLower,
+      phone,
       password:hashedPassword,
       userType,
       accountVerificationToken,
       isAccountVerified: false,
     });
 
+    if(userType === "vet"){
+      newUser.clientInfo = undefined;
+    }
+    if(userType === "client"){
+      newUser.vetInfo = undefined;
+    }
 
-    await newUser.save();
+
+    await newUser.save()
 
     //send verification email
     const verificationLink = `http://localhost:5001/auth/verify-email?token=${accountVerificationToken}`;
