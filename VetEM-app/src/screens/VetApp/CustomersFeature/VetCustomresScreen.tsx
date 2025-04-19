@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,16 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import CustomerCard from "./components/CustomerCard";
+import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode"; 
+
+
+
 
 interface Customer {
   _id: string;
@@ -30,6 +37,37 @@ const VetCustomresScreen = ({ navigation }: VetHomeScreenProps) => {
   const [customerWaitingApproval, setCustomerWaitingApproval] = useState<
     Customer[]
   >([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(()=>{
+    const fetchCustomers = async () => {
+      setLoading(true);
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (!token) return;
+        const decodedUser = jwtDecode(token) as { userId: string };
+        console.log(decodedUser.userId);
+        const response = await axios.get(`http://192.168.10.126:5000/mongodb/vetcustomers/${decodedUser.userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCustomres(response.data.customers.vetClients);
+        setCustomersRequests(response.data.customers.vetClientRequests);
+        setCustomerWaitingApproval(response.data.customers.vetClientWaitApproval);
+    
+
+  }catch (error) {
+        console.error("Error fetching customers:", error);
+      }
+      finally {
+        setLoading(false);
+      }
+    };
+    fetchCustomers();
+  },[])
 
   const handleAcceptCustomer = (customerId: string) => {
     // Here you can call the API to accept the customer request
@@ -127,7 +165,10 @@ const VetCustomresScreen = ({ navigation }: VetHomeScreenProps) => {
         )}
 
         <Text style={styles.customerRequstTxt}>Your Customers</Text>
-        <View style={styles.customerContaier}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ):(
+          <View style={styles.customerContaier}>
           {customres.map((customer) => (
             <CustomerCard
               key={customer._id}
@@ -160,6 +201,8 @@ const VetCustomresScreen = ({ navigation }: VetHomeScreenProps) => {
             </Text>
           )}
         </View>
+        )}
+  
       </ScrollView>
     </View>
   );

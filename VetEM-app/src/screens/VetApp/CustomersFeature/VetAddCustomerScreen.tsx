@@ -24,7 +24,7 @@ const VetAddCustomerScreen = () => {
   useEffect(()=>{
     const fetchCustomers = async () =>{
       try {
-        const response = await axios.get(``);
+        const response = await axios.get(`http://192.168.10.126:5000/mongodb/user/customers`);
         setAllCustomers(response.data.customers);
       } catch (error) {
         console.error("Error fetching customers:", error);

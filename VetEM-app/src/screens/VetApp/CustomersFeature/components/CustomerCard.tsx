@@ -31,7 +31,7 @@ const CustomerCard = ({customer,onPress,onLongPress}:CustomerCardProps) => {
           <Text style={styles.name}>{customer.firstName} {customer.lastName}</Text>
           <Text style={styles.text}>📧 {customer.email}</Text>
           <Text style={styles.text}>📞 {customer.phone}</Text>
-          <Text style={styles.text}>🐾 Pets: {customer.pets.join(', ')}</Text>
+          <Text style={styles.text}>🐾 Pets: {customer.pets}</Text>
         </View>
       
       
