@@ -12,7 +12,6 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomerCard from "./components/CustomerCard";
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode"; 
 
 
 
@@ -45,9 +44,7 @@ const VetCustomresScreen = ({ navigation }: VetHomeScreenProps) => {
       try {
         const token = await AsyncStorage.getItem("authToken");
         if (!token) return;
-        const decodedUser = jwtDecode(token) as { userId: string };
-        console.log(decodedUser.userId);
-        const response = await axios.get(`http://192.168.10.126:5000/mongodb/vetcustomers/${decodedUser.userId}`,
+        const response = await axios.get(`http://192.168.10.126:5000/mongodb/vetcustomers`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -67,7 +64,7 @@ const VetCustomresScreen = ({ navigation }: VetHomeScreenProps) => {
       }
     };
     fetchCustomers();
-  },[])
+  },[]);
 
   const handleAcceptCustomer = (customerId: string) => {
     // Here you can call the API to accept the customer request
@@ -98,7 +95,11 @@ const VetCustomresScreen = ({ navigation }: VetHomeScreenProps) => {
       <Text style={styles.titletxt}>Manage Your Customers</Text>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate("VetAddCustomerScreen")}
+        onPress={() => navigation.navigate("VetAddCustomerScreen",{
+          customres,
+          customersRequests,
+          customerWaitingApproval,
+        })}
       >
         <Ionicons name="add-circle-outline" size={24} color="white" />
         <Text style={styles.addButtonText}>Add Customer</Text>

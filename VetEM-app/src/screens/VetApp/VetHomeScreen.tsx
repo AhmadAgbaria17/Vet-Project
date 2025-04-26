@@ -88,26 +88,6 @@ useEffect(()=>{
             textTitle={"Q&A"}
             textCard={"Answer pet health questions"}
             />
-      
-            <FeatureCard
-              user={user} 
-              navigation={navigation} 
-              pathName={"Appointments"}
-              iconName={'calendar-outline'}
-              iconColor={"#9b59b6"}
-              textTitle={"Appointments"}
-              textCard={"Manage scheduled visits"}
-            />
-      
-            <FeatureCard 
-              user={user}
-              navigation={navigation} 
-              pathName={"MedicalRecords"}
-              iconName={'document-text-outline'}
-              iconColor={"#e74c3c"}
-              textTitle={"Medical Records"}
-              textCard={"Access pet medical histories"}
-            />
             
           </View>
       

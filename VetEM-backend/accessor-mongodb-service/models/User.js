@@ -32,7 +32,7 @@ const UserSchema = new Schema
     },
     userType:{
       type: String,
-      enum: ['client', 'vet' , 'admin'],
+      enum: ['client', 'vet'],
       required:true,
     },
     profileImg:{
@@ -82,6 +82,25 @@ const UserSchema = new Schema
           ref: 'Pet',
         },
       ],
+      clientVet:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+        },
+      ],
+      clientVetRequests:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+        },
+      ],
+      clientVetWaitApproval:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+        },
+      ],
+
     },
     
   },

@@ -227,16 +227,15 @@ module.exports.mongoDeleteOneClinicCrtl = asyncHandler(async (req, res) => {
 
 /**
  * @desc get all the customers of the vet clinic
- * @route mongodb/vetcustomers/:vetId
+ * @route mongodb/vetcustomers
  * @method Get
  * @access private
  */
 module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
-  const vetId = req.params.vetId;
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.get(
-      `http://localhost:5001/vetcustomers/${vetId}`,
+      `http://localhost:5001/vetcustomers`,
       {
         headers: {
           Authorization: authToken,
@@ -253,3 +252,35 @@ module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
     });
   }
 }); 
+
+/**
+ * @desc add a customer to the vet list of customers
+ * @route mongodb/vetcustomers/:customerId
+ * @method Post
+ * @access private
+ */
+module.exports.mongoaddcustomertoVetCtrl = asyncHandler(async (req, res) => {
+  const customerId = req.params.customerId;
+  const authToken = req.header("Authorization");
+  try {
+    const respone = await axios.post(
+      `http://localhost:5001/vetcustomers/${customerId}`,
+      {},
+      {
+        headers: {
+          Authorization: authToken,
+        },
+      }
+    );
+    res.status(200).json({
+
+      message: respone.data.message,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+});
+
+

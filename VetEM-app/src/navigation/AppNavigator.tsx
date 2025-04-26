@@ -8,7 +8,6 @@ import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import VetHomeScreen from '../screens/VetApp/VetHomeScreen';
 import ClientHomeScreen from '../screens/ClientApp/ClientHomeScreen';
-import AdminHomeScreen from '../screens/AdminApp/AdminHomeScreen';
 import VetClinicsScreen from '../screens/VetApp/ClinicsFeature/VetClincsScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import { jwtDecode } from "jwt-decode"; 
@@ -78,10 +77,7 @@ const AppNavigator = () => {
           drawerType:'slide',
         }}
         >
-          {/* Admin Screens */}
-          {user?.userType === 'admin' && (
-            <Drawer.Screen name="AdminHome" component={AdminHomeScreen} />
-          )}
+      
 
           {/* Vet Screens */}
           {user?.userType === 'vet' && (

@@ -1,4 +1,4 @@
-const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl } = require('../controllers/mongodbController');
+const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl } = require('../controllers/mongodbController');
 
 const router = require('express').Router();
 
@@ -33,8 +33,12 @@ router.route('/clinic/item/:clinicId')
 .put(mongoUpdateOneClinicCtrl)
 .delete(mongoDeleteOneClinicCrtl)
 
-// /mongodb/vetcustomers/:vetId
-router.route('/vetcustomers/:vetId')
+// /mongodb/vetcustomers
+router.route('/vetcustomers')
 .get(mongoGetVetCustomersCtrl)
+
+// /mongodb/vetcustomers/:customerId
+router.route('/vetcustomers/:customerId')
+.post(mongoaddcustomertoVetCtrl)
 
 module.exports = router;

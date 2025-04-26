@@ -2,6 +2,11 @@ import React , {useEffect,} from 'react';
 import { View,Text , StyleSheet,TextInput,ActivityIndicator,FlatList,Alert } from 'react-native';
 import axios from 'axios';
 import CustomerCard from './components/CustomerCard';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from 'react-native-toast-message';
+import { useRoute, RouteProp } from '@react-navigation/native';
+
+
 
 
 interface Customer {
@@ -14,10 +19,25 @@ interface Customer {
   pets: string[]; 
 }
 
+type VetAddCustomerScreenRouteProp = RouteProp<{
+  params: {
+    customres: any[]; 
+    customersRequests: any[];
+    customerWaitingApproval: any[];
+  };
+}, 'params'>;
+
+
+
 const VetAddCustomerScreen = () => {
   const [searchText, setSearchText] = React.useState('');
   const [allCustomers, setAllCustomers] = React.useState<Customer[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const route = useRoute<VetAddCustomerScreenRouteProp>();
+
+  const { customres, customersRequests, customerWaitingApproval } = route.params;
+  
+
 
 
 
@@ -43,18 +63,36 @@ const VetAddCustomerScreen = () => {
 
   const handleInviteCustomer = async (customerId:string) => {
     try {
-      const response = await axios.post(``, {customerId});
-      Alert.alert("Success", response.data.message);
-    } catch (error) {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.post(`http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}`,{},{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      } );
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: response.data.message,
+      });
+    } catch (error:any) {
       console.error("Error accepting customer:", error);
-      Alert.alert("Error", "Failed to accept customer.");
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.response.data.message,
+      });
     }
   };
 
 
   return (
     <View style={styles.container}>  
+    
       <View style={styles.emptyHeader}></View>
+      <View style={styles.toast}>
+                <Toast/>
+      </View>
       <Text style={styles.titletxt}>Search for Customers</Text>
       
       <TextInput
@@ -82,7 +120,7 @@ const VetAddCustomerScreen = () => {
                                   [
                 
                                     {
-                                      text: "Accept",
+                                      text: "Invite",
                                       onPress: () => handleInviteCustomer(item._id),
                                       style: "default",
                                     },
@@ -128,5 +166,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize:12,
     color:'#333',
+  },
+  toast:{
+    position:"absolute",
+    top:20,
+    right:200,
+    zIndex:1,
   },
 })
