@@ -29,8 +29,6 @@ const ClientHomeScreen = ({navigation}:ClientHomeScreenProps) => {
 
   },[])
 
-
-
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -39,26 +37,52 @@ const ClientHomeScreen = ({navigation}:ClientHomeScreenProps) => {
       <ScrollView>
         {/*welcome section*/}
         
-        <View  style={styles.welcomeSection} >
-          <Text>CLient APP</Text>
-          <Text onPress={()=> navigation.navigate('Clinics')} style={styles.welcomeTitle} >
-            Welcome {user ? `Dr.${user.firstName}`:"!"}!
-            </Text>
+        <View style={styles.welcomeSection} >
+          <Text style={styles.welcomeTitle} >
+            Welcome {user ? user.firstName : ""}!
+          </Text>
           <Text style={styles.welcomeSubtitle} >
             Find nearby veterinary clinics, emergency services, and pet care tips.
           </Text>
         </View>
     
-        {/*Assists Cards*/}
+        {/*Features Cards*/}
         <View style={styles.featuresSection}>
-        
+          <FeatureCard 
+            user={user}
+            navigation={navigation} 
+            pathName={"NearbyVets"}
+            iconName={'search-outline'}
+            iconColor={"#3498db"}
+            textTitle={"Find Vets"}
+            textCard={"Search for veterinary clinics near you"}
+          />
           
+          <FeatureCard 
+            user={user}
+            navigation={navigation} 
+            pathName={"MyPets"}
+            iconName={'paw-outline'}
+            iconColor={"#27ae60"}
+            textTitle={"My Pets"}
+            textCard={"Manage your pets' profiles and records"}
+          />
+          
+          <FeatureCard 
+            user={user}
+            navigation={navigation} 
+            pathName={"Appointments"}
+            iconName={'calendar-outline'}
+            iconColor={"#e74c3c"}
+            textTitle={"Appointments"}
+            textCard={"Schedule and manage vet visits"}
+          />
         </View>
 
         {/* Promo Section */}
         <View style={styles.promoSection}>
           <Image
-            source={{ uri: 'https://media.istockphoto.com/id/1353103116/photo/veterinarian-examining-cute-pug-dog-and-cat-in-clinic-closeup-vaccination-day.jpg?s=612x612&w=0&k=20&c=rVYhuc25uTbejkXgkfgfOwGLpTmNJ_zGafejYKgqer0=' }}
+            source={{ uri: 'https://media.istockphoto.com/id/1353103116/photo/veterinarian-examining-cute-pug-dog-and-cat-in-clinic-closeup-vaccination-day.jpg?s=612x612&w=0&k=20&c=rVYhuc25uTbejkXgfgfOwGLpTmNJ_zGafejYKgqer0=' }}
             style={styles.promoImage}
           />
           <Text style={styles.promoText}>

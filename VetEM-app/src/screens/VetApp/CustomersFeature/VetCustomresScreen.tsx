@@ -12,9 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomerCard from "./components/CustomerCard";
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
-
+import Toast from 'react-native-toast-message';
 
 interface Customer {
   _id: string;
@@ -26,112 +24,145 @@ interface Customer {
   pets: string[];
 }
 
-interface VetHomeScreenProps {
+interface VetCustomersScreenProps {
   navigation: any;
 }
 
-const VetCustomresScreen = ({ navigation }: VetHomeScreenProps) => {
-  const [customres, setCustomres] = useState<Customer[]>([]);
-  const [customersRequests, setCustomersRequests] = useState<Customer[]>([]);
-  const [customerWaitingApproval, setCustomerWaitingApproval] = useState<
-    Customer[]
-  >([]);
+const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerRequests, setCustomerRequests] = useState<Customer[]>([]);
+  const [customerWaitingApproval, setCustomerWaitingApproval] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(()=>{
-    const fetchCustomers = async () => {
-      setLoading(true);
-      try {
-        const token = await AsyncStorage.getItem("authToken");
-        if (!token) return;
-        const response = await axios.get(`http://192.168.10.126:5000/mongodb/vetcustomers`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCustomres(response.data.customers.vetClients);
-        setCustomersRequests(response.data.customers.vetClientRequests);
-        setCustomerWaitingApproval(response.data.customers.vetClientWaitApproval);
-    
-
-  }catch (error) {
-        console.error("Error fetching customers:", error);
-      }
-      finally {
-        setLoading(false);
-      }
-    };
+  useEffect(() => {
     fetchCustomers();
-  },[]);
+  }, []);
 
-  const handleAcceptCustomer = (customerId: string) => {
-    // Here you can call the API to accept the customer request
+  const fetchCustomers = async () => {
+    setLoading(true);
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) return;
+      
+      const response = await axios.get(
+        `http://192.168.10.126:5000/mongodb/vetcustomers`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      setCustomers(response.data.customers.vetClients);
+      setCustomerRequests(response.data.customers.vetClientRequests);
+      setCustomerWaitingApproval(response.data.customers.vetClientWaitApproval);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to load customers',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteCustomer = (customerId: string) => {
-    Alert.alert(
-      "Delete Customer",
-      "Are you sure you want to delete this customer?",
-      [
+  const handleAcceptCustomer = async (customerId: string) => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) return;
+
+      await axios.post(
+        `http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}/accept`,
+        {},
         {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "OK",
-          onPress: () => {
-            // Logic to delete the customer
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        },
-      ]
-    );
+        }
+      );
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Customer request accepted',
+      });
+
+      fetchCustomers();
+    } catch (error) {
+      console.error("Error accepting customer:", error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to accept customer request',
+      });
+    }
+  };
+
+  const handleDeleteCustomer = async (customerId: string) => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) return;
+
+      await axios.delete(
+        `http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Customer removed successfully',
+      });
+
+      fetchCustomers();
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to remove customer',
+      });
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.emptyHeader}></View>
+      <Toast />
       <Text style={styles.titletxt}>Manage Your Customers</Text>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate("VetAddCustomerScreen",{
-          customres,
-          customersRequests,
-          customerWaitingApproval,
-        })}
+        onPress={() => navigation.navigate("VetAddCustomerScreen")}
       >
         <Ionicons name="add-circle-outline" size={24} color="white" />
         <Text style={styles.addButtonText}>Add Customer</Text>
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
-        {customersRequests.length > 0 && (
+        {/* Customer Requests Section */}
+        {customerRequests.length > 0 && (
           <View>
-            <Text style={styles.customerRequstTxt}>Customers Requests</Text>
-            <View style={styles.customerContaier}>
-              {customersRequests.map((customer) => (
+            <Text style={styles.sectionTitle}>New Requests</Text>
+            <View style={styles.customerContainer}>
+              {customerRequests.map((customer) => (
                 <CustomerCard
                   key={customer._id}
                   customer={customer}
-                  onPress={() =>
-                    navigation.navigate("VetClientProfileScreen", { customer })
-                  }
-                  onLongPress={() => {
+                  onPress={() => {
                     Alert.alert(
                       "Customer Request",
-                      `What do you want to do with ${customer.firstName} ${customer.lastName}?`,
+                      `Accept request from ${customer.firstName} ${customer.lastName}?`,
                       [
                         {
                           text: "Accept",
                           onPress: () => handleAcceptCustomer(customer._id),
                           style: "default",
-                        },
-
-                        {
-                          text: "Delete",
-                          onPress: () => handleDeleteCustomer(customer._id),
-                          style: "destructive",
                         },
                         {
                           text: "Cancel",
@@ -146,70 +177,68 @@ const VetCustomresScreen = ({ navigation }: VetHomeScreenProps) => {
           </View>
         )}
 
+        {/* Waiting Approval Section */}
         {customerWaitingApproval.length > 0 && (
           <View>
-            <Text style={styles.customerRequstTxt}>
-              Waiting for customer approval
-            </Text>
-            <View style={styles.customerContaier}>
+            <Text style={styles.sectionTitle}>Waiting for Customer Approval</Text>
+            <View style={styles.customerContainer}>
               {customerWaitingApproval.map((customer) => (
                 <CustomerCard
                   key={customer._id}
                   customer={customer}
-                  onPress={() =>
-                    navigation.navigate("VetClientProfileScreen", { customer })
-                  }
+                  onPress={() => {}}
+                  disabled={true}
                 />
               ))}
             </View>
           </View>
         )}
 
-        <Text style={styles.customerRequstTxt}>Your Customers</Text>
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ):(
-          <View style={styles.customerContaier}>
-          {customres.map((customer) => (
-            <CustomerCard
-              key={customer._id}
-              customer={customer}
-              onPress={() =>
-                navigation.navigate("VetClientProfileScreen", { customer })
-              }
-              onLongPress={() => {
-                Alert.alert(
-                  "Customer",
-                  `Do you want to delete ${customer.firstName} ${customer.lastName}?`,
-                  [
-                    {
-                      text: "Delete",
-                      onPress: () => handleDeleteCustomer(customer._id),
-                      style: "destructive",
-                    },
-                    {
-                      text: "Cancel",
-                      style: "cancel",
-                    },
-                  ]
-                );
-              }}
-            />
-          ))}
-          {customres.length === 0 && (
-            <Text style={{ textAlign: "center", marginTop: 10 }}>
-              You don't have any customers yet.
-            </Text>
+        {/* Current Customers Section */}
+        <View>
+          <Text style={styles.sectionTitle}>Your Customers</Text>
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <View style={styles.customerContainer}>
+              {customers.map((customer) => (
+                <CustomerCard
+                  key={customer._id}
+                  customer={customer}
+                  onPress={() =>
+                    navigation.navigate("VetClientProfileScreen", { customer })
+                  }
+                  onLongPress={() => {
+                    Alert.alert(
+                      "Remove Customer",
+                      `Do you want to remove ${customer.firstName} ${customer.lastName}?`,
+                      [
+                        {
+                          text: "Remove",
+                          onPress: () => handleDeleteCustomer(customer._id),
+                          style: "destructive",
+                        },
+                        {
+                          text: "Cancel",
+                          style: "cancel",
+                        },
+                      ]
+                    );
+                  }}
+                />
+              ))}
+              {customers.length === 0 && !loading && (
+                <Text style={styles.emptyMessage}>
+                  You don't have any customers yet.
+                </Text>
+              )}
+            </View>
           )}
         </View>
-        )}
-  
       </ScrollView>
     </View>
   );
 };
-
-export default VetCustomresScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -226,8 +255,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
   },
   addButtonText: {
     color: "white",
@@ -242,15 +269,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
   },
-  customerRequstTxt: {
-    fontSize: 14,
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: "bold",
-
-    textAlign: "left",
-    borderBottomColor: "#ccc",
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#333",
   },
-  customerContaier: {
-    borderRadius: 8,
-    marginBottom: 15,
+  customerContainer: {
+    gap: 10,
+  },
+  emptyMessage: {
+    textAlign: "center",
+    color: "#666",
+    marginTop: 10,
   },
 });
+
+export default VetCustomresScreen;

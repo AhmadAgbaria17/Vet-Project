@@ -21,9 +21,9 @@ interface Customer {
 
 type VetAddCustomerScreenRouteProp = RouteProp<{
   params: {
-    customres: any[]; 
-    customersRequests: any[];
-    customerWaitingApproval: any[];
+    customres: Customer[]; 
+    customersRequests: Customer[];
+    customerWaitingApproval: Customer[];
   };
 }, 'params'>;
 
@@ -44,8 +44,18 @@ const VetAddCustomerScreen = () => {
   useEffect(()=>{
     const fetchCustomers = async () =>{
       try {
-        const response = await axios.get(`http://192.168.10.126:5000/mongodb/user/customers`);
-        setAllCustomers(response.data.customers);
+        const allExcludedIds = [
+          ...customres.map(c => c._id),
+          ...customersRequests.map(c => c._id),
+          ...customerWaitingApproval.map(c => c._id),
+        ];
+
+
+      const response = await axios.get(`http://192.168.10.126:5000/mongodb/user/customers`);
+      const filteredCustomers = response.data.customers.filter((customer: Customer) => {
+        return !allExcludedIds.includes(customer._id);
+      });
+        setAllCustomers(filteredCustomers);
       } catch (error) {
         console.error("Error fetching customers:", error);
         
@@ -86,6 +96,7 @@ const VetAddCustomerScreen = () => {
   };
 
 
+
   return (
     <View style={styles.container}>  
     
@@ -103,6 +114,12 @@ const VetAddCustomerScreen = () => {
         onChangeText={setSearchText}
         keyboardType="email-address"
         />
+        
+      {filterCustomers.length === 0 && (
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
+          No customers found
+        </Text>
+      )}
 
         {loading?(
           <ActivityIndicator size="large" color="#666" style={{ marginTop: 20 }} />
