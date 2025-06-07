@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const { Clinic, validateClinic, validateUpdateClinic } = require("../models/Clinic");
 const { User } = require("../models/User");
 const mongoose = require('mongoose');
+const jwt = require("jsonwebtoken");
 
 
 /**
@@ -110,14 +111,22 @@ module.exports.deleteClinic = asyncHandler(async (req, res) => {
 
 
 /**
- * @desc get all user Clinics
- * @route /clinic/home/:id
+ * @desc get all vet Clinics
+ * @route /clinic
  * @method Get
  * @access private
  */
 module.exports.getAllClincs = asyncHandler(async (req, res) => {
   try {
-    const userId = req.params.userId;
+
+    const authToken = req.header("Authorization");
+    if (!authToken) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+  
+    const token = authToken.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
 
     if(!mongoose.Types.ObjectId.isValid(userId)){
       return res.status(400).json({message:"invalid id"})
@@ -127,7 +136,8 @@ module.exports.getAllClincs = asyncHandler(async (req, res) => {
       path: 'vetInfo.clinics',
       select:'-userId -__v',
     });
-  
+    
+    console.log("user.vetInfo.clinics", user.vetInfo.clinics);
 
     res.status(201).json({
        message: "got all the clinics Successfully",

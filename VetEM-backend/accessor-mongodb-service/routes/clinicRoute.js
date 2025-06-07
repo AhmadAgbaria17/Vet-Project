@@ -5,14 +5,13 @@ const router = require('express').Router();
 
 // /clinic
 router.route("")
-.post(verifyToken,addClinic);
+.post(verifyToken,addClinic)
+.get(getAllClincs);
 
-// /clinic/:userId
-router.route("/:userId")
-.get(getAllClincs)
 
-// /clinic/item/:clinicId
-router.route("/item/:clinicId")
+
+// /clinic/:clinicId
+router.route("/:clinicId")
 .put(verifyToken,updateClinic)
 .delete(verifyToken,deleteClinic)
 

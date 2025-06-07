@@ -39,12 +39,10 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
   const [editMode, setEditMode] = useState(false);
   const [updateLocation, setUpdateLocation] = useState(false);
 
-  useEffect(() => {
-    requestLocationPermission();
-    fetchClinics();
-  }, []);
 
-  const requestLocationPermission = async () => {
+// Request location permission and fetch clinics on component mount
+  useEffect(() => {
+      const requestLocationPermission = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
@@ -54,7 +52,11 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
     }
   };
 
-  const fetchClinics = async () => {
+    requestLocationPermission();
+    fetchClinics();
+  }, []);
+  
+    const fetchClinics = async () => {
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem("authToken");
@@ -68,7 +70,8 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
           },
         }
       );
-      setClinics(response.data.clinics);
+      setClinics(response.data.UserClinics);
+  
     } catch (error: any) {
       console.error(
         "Error fetching clinics:",
@@ -84,6 +87,9 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
     }
   };
 
+
+
+// Function to fetch clinics from the server
   const handleAddClinic = async () => {
     if (!name || !openTime) {
       Toast.show({
@@ -119,7 +125,7 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
       };
 
       await axios.post(
-        "http://192.168.10.126:5000/mongodb/clinics",
+        "http://192.168.10.126:5000/mongodb/clinic",
         newClinic,
         {
           headers: {
@@ -147,6 +153,7 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
     }
   };
 
+  // Function to handle editing a clinic
   const handleEditClinic = async () => {
     if (!name || !openTime) {
       Toast.show({
@@ -207,6 +214,8 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
     }
   };
 
+
+  // Function to handle deleting a clinic
   const handleDeleteClinic = async (clinicId: string) => {
     try {
       const token = await AsyncStorage.getItem("authToken");
@@ -237,6 +246,8 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
       });
     }
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -317,7 +328,7 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
-            clinics.map((clinic) => (
+            clinics?.map((clinic) => (
               <View key={clinic._id} style={styles.clinicCard}>
                 <View style={styles.clinicHeader}>
                   <View>
@@ -374,6 +385,7 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
             ))
           )}
         </View>
+        <View style={{ height: 70 }} />
       </ScrollView>
     </View>
   );
@@ -456,6 +468,7 @@ const styles = StyleSheet.create({
   },
   clinicsList: {
     gap: 15,
+    paddingBottom: 20,
   },
   clinicCard: {
     backgroundColor: "white",

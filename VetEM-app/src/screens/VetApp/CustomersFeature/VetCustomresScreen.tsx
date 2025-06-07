@@ -73,8 +73,8 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) return;
 
-      await axios.post(
-        `http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}/accept`,
+      await axios.put(
+        `http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}`,
         {},
         {
           headers: {
@@ -134,7 +134,7 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.emptyHeader}></View>
-      <Toast />
+      <Toast topOffset={70} />
       <Text style={styles.titletxt}>Manage Your Customers</Text>
       <TouchableOpacity
         style={styles.addButton}
@@ -144,12 +144,15 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
         <Text style={styles.addButtonText}>Add Customer</Text>
       </TouchableOpacity>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 15 }}>
         {/* Customer Requests Section */}
         {customerRequests.length > 0 && (
           <View>
             <Text style={styles.sectionTitle}>New Requests</Text>
-            <View style={styles.customerContainer}>
+            {loading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <View style={styles.customerContainer}>
               {customerRequests.map((customer) => (
                 <CustomerCard
                   key={customer._id}
@@ -174,6 +177,8 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
                 />
               ))}
             </View>
+            )}
+          
           </View>
         )}
 
@@ -181,7 +186,11 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
         {customerWaitingApproval.length > 0 && (
           <View>
             <Text style={styles.sectionTitle}>Waiting for Customer Approval</Text>
-            <View style={styles.customerContainer}>
+            {loading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+
+            ): (
+                  <View style={styles.customerContainer}>
               {customerWaitingApproval.map((customer) => (
                 <CustomerCard
                   key={customer._id}
@@ -191,6 +200,7 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
                 />
               ))}
             </View>
+            )}
           </View>
         )}
 
@@ -248,7 +258,6 @@ const styles = StyleSheet.create({
   },
   emptyHeader: {
     height: 30,
-    zIndex: 1,
   },
   titletxt: {
     fontSize: 24,

@@ -111,6 +111,7 @@ module.exports.mongoAddClinicCtrl = asyncHandler(async (req, res) => {
   const { name, openTime, location, userId } = req.body;
   const authToken = req.header("Authorization");
   try {
+    
     const respone = await axios.post(
       "http://localhost:5001/clinic",
       {
@@ -138,15 +139,21 @@ module.exports.mongoAddClinicCtrl = asyncHandler(async (req, res) => {
 
 /**
  * @desc get all the clinics of the user
- * @route mongodb/clinic/:userId
+ * @route mongodb/clinic
  * @method Get
  * @access private
  */
 module.exports.mongoGetAllUserClinicsCtrl = asyncHandler(async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const respone = await axios.get(`http://localhost:5001/clinic`,
+      {
+        headers: {
+          Authorization: req.header("Authorization"),
+        },
+      }
+    );
 
-    const respone = await axios.get(`http://localhost:5001/clinic/${userId}`);
+
     res.status(200).json({
       message: respone.data.message,
       UserClinics: respone.data.UserClinics,
@@ -172,7 +179,7 @@ module.exports.mongoUpdateOneClinicCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.put(
-      `http://localhost:5001/clinic/item/${clinicId}`,
+      `http://localhost:5001/clinic/${clinicId}`,
       {
         name,
         openTime,
@@ -207,7 +214,7 @@ module.exports.mongoDeleteOneClinicCrtl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.delete(
-      `http://localhost:5001/clinic/item/${clinicId}`,
+      `http://localhost:5001/clinic/${clinicId}`,
       {
         headers: {
           Authorization: authToken,
@@ -274,6 +281,63 @@ module.exports.mongoaddcustomertoVetCtrl = asyncHandler(async (req, res) => {
     );
     res.status(200).json({
 
+      message: respone.data.message,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+});
+
+/**
+ * @desc access a vet customer
+ * @route mongodb/vetcustomers/:customerId
+ * @method Put
+ * @access private
+ */
+module.exports.mongoAcceptVetCustomerCtrl = asyncHandler(async (req, res) => {
+  const customerId = req.params.customerId;
+  const authToken = req.header("Authorization");
+  try {
+    const respone = await axios.put(
+      `http://localhost:5001/vetcustomers/${customerId}`,
+      {},
+      {
+        headers: {
+          Authorization: authToken,
+        },
+      }
+    );
+    res.status(200).json({
+      message: respone.data.message,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+});
+
+/**
+ * @desc delete a vet customer
+ * @route mongodb/vetcustomers/:customerId
+ * @method Delete
+ * @access private
+ */
+module.exports.mongoDeleteVetCustomerCtrl = asyncHandler(async (req, res) => {
+  const customerId = req.params.customerId;
+  const authToken = req.header("Authorization");
+  try {
+    const respone = await axios.delete(
+      `http://localhost:5001/vetcustomers/${customerId}`,
+      {
+        headers: {
+          Authorization: authToken,
+        },
+      }
+    );
+    res.status(200).json({
       message: respone.data.message,
     });
   } catch (error) {

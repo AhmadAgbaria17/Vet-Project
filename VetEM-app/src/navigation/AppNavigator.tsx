@@ -103,6 +103,7 @@ const AppNavigator = () => {
                   component={VetClinicsScreen}
                   initialParams={{ user }}
                 />
+                
                 <Drawer.Screen name="vetCustomers" component={VetCustomresScreen}/>
                 <Drawer.Screen name="VetAddCustomerScreen" component={VetAddCustomerScreen}/>
                 <Drawer.Screen name="VetClientProfileScreen" component={VetClientProfileScreen}/>
