@@ -9,66 +9,60 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '../../../components/Header';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-
-interface Pet {
-  _id: string;
-  name: string;
-  species: string;
-  breed: string;
-  age: number;
-  medicalHistory: string;
-}
+import { Customer } from '../../../interfaces/types';
 
 interface VetClientProfileScreenProps {
   navigation: any;
   route: {
     params: {
-      customer: {
-        _id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        phone: string;
-      };
+      customerId: string;
     };
   };
 }
 
+
+
 const VetClientProfileScreen = ({ navigation, route }: VetClientProfileScreenProps) => {
-  const { customer } = route.params;
-  const [pets, setPets] = useState<Pet[]>([]);
+  const { customerId } = route.params;
   const [loading, setLoading] = useState(true);
+  const [customer, setCustomer] = useState<Customer>(
+    {
+      _id: customerId,
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      profileImg: '',
+      clientInfo: {
+        pets: [],
+        clientVet: [],
+        clientVetRequests: [],
+        clientVetWaitApproval: [],
+      },
+    }
+  );
 
   useEffect(() => {
-    fetchCustomerPets();
+    // Simulate a delay for fetching customer data
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        
+      } catch (error) {
+        console.error('Error fetching customer data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const fetchCustomerPets = async () => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) return;
-
-      const response = await axios.get(
-        `http://192.168.10.126:5000/mongodb/customer/${customer._id}/pets`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setPets(response.data.pets);
-    } catch (error) {
-      console.error('Error fetching customer pets:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddMedicalRecord = (petId: string) => {
-    navigation.navigate('AddMedicalRecord', { petId, customerId: customer._id });
+    navigation.navigate('AddMedicalRecord', { petId, customerId });
   };
 
   return (
@@ -104,7 +98,7 @@ const VetClientProfileScreen = ({ navigation, route }: VetClientProfileScreenPro
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <View style={styles.petsContainer}>
-              {pets.map((pet) => (
+              {customer.clientInfo?.pets.map((pet) => (
                 <View key={pet._id} style={styles.petCard}>
                   <View style={styles.petHeader}>
                     <View>
@@ -124,7 +118,7 @@ const VetClientProfileScreen = ({ navigation, route }: VetClientProfileScreenPro
 
                   <View style={styles.medicalHistoryContainer}>
                     <Text style={styles.medicalHistoryTitle}>Medical History</Text>
-                    <Text style={styles.medicalHistoryText}>{pet.medicalHistory}</Text>
+                    <Text style={styles.medicalHistoryText}>{}</Text>
                   </View>
                 </View>
               ))}

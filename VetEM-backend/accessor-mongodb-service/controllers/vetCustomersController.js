@@ -25,7 +25,8 @@ module.exports.getAllCustomersCtrl = asyncHandler(async (req, res)=> {
     .populate("vetInfo.vetClients", "-password -__v -createdAt -updatedAt -vetInfo")
     .populate("vetInfo.vetClientRequests", "-password -__v -createdAt -updatedAt -vetInfo")
     .populate("vetInfo.vetClientWaitApproval", "-password -__v -createdAt -updatedAt -vetInfo")
-    .select("-password -__v -createdAt -updatedAt");
+    .select("-password -__v -createdAt -updatedAt -clientInfo");
+
 
     if (!vet) {
       return res.status(404).json({ message: "Vet not found" });

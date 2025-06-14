@@ -21,9 +21,10 @@ interface Customer {
 
 type VetAddCustomerScreenRouteProp = RouteProp<{
   params: {
-    customres: Customer[]; 
-    customersRequests: Customer[];
+    customers: Customer[]; 
+    customerRequests: Customer[];
     customerWaitingApproval: Customer[];
+    fetchCustomers: () => Promise<void>; // Function to fetch customers
   };
 }, 'params'>;
 
@@ -35,18 +36,15 @@ const VetAddCustomerScreen = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const route = useRoute<VetAddCustomerScreenRouteProp>();
 
-  const { customres, customersRequests, customerWaitingApproval } = route.params;
+  const { customers, customerRequests, customerWaitingApproval ,fetchCustomers} = route.params;
   
-
-
-
-
-  useEffect(()=>{
-    const fetchCustomers = async () =>{
+    const fetchCustomer = async () =>{
       try {
+        setLoading(true);
+
         const allExcludedIds = [
-          ...customres.map(c => c._id),
-          ...customersRequests.map(c => c._id),
+          ...customers.map(c => c._id),
+          ...customerRequests.map(c => c._id),
           ...customerWaitingApproval.map(c => c._id),
         ];
 
@@ -63,9 +61,12 @@ const VetAddCustomerScreen = () => {
         setLoading(false);
       }
     }
-    fetchCustomers();
-  },[])
+  useEffect(()=>{
+    
 
+    fetchCustomer();
+  },[])
+  
   const filterCustomers = allCustomers.filter((customer)=>
     customer.email.toLowerCase().includes(searchText.toLowerCase()) ||
     customer.phone.includes(searchText)
@@ -74,12 +75,15 @@ const VetAddCustomerScreen = () => {
   const handleInviteCustomer = async (customerId:string) => {
     try {
       const token = await AsyncStorage.getItem("authToken");
-
       const response = await axios.post(`http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}`,{},{
         headers: {
           Authorization: `Bearer ${token}`,
         },
       } );
+      fetchCustomers?.(); // Refresh the customer list after inviting
+      setAllCustomers(prev =>
+    prev.filter(customer => customer._id !== customerId)
+  );
       Toast.show({
         type: 'success',
         text1: 'Success',

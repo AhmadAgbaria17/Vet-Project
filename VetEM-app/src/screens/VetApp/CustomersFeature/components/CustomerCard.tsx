@@ -1,16 +1,8 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { Customer } from '../../../../interfaces/types'; // Assuming you have a types file for Customer interface
 
-interface Customer {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  profileImg: string; 
-  phone: string; 
-  pets: string[]; 
-}
 
 interface CustomerCardProps {
   customer: Customer;
@@ -20,6 +12,7 @@ interface CustomerCardProps {
 }
 
 const CustomerCard = ({ customer, onPress, onLongPress, disabled = false }: CustomerCardProps) => {
+
   return (
     <View >
       <TouchableOpacity
@@ -41,7 +34,8 @@ const CustomerCard = ({ customer, onPress, onLongPress, disabled = false }: Cust
           <Text style={styles.name}>{customer.firstName} {customer.lastName}</Text>
           <Text style={styles.text}>📧 {customer.email}</Text>
           <Text style={styles.text}>📞 {customer.phone}</Text>
-          <Text style={styles.text}>🐾 Pets: {customer.pets}</Text>
+          <Text style={styles.text}>🐾 {customer.clientInfo?.pets.length}</Text>
+      
         </View>
       </TouchableOpacity>
     </View>

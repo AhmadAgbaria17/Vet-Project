@@ -1,4 +1,4 @@
-const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl, mongoAcceptVetCustomerCtrl, mongoDeleteVetCustomerCtrl } = require('../controllers/mongodbController');
+const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl, mongoAcceptVetCustomerCtrl, mongoDeleteVetCustomerCtrl, mongoAddPetCtrl } = require('../controllers/mongodbController');
 
 const router = require('express').Router();
 
@@ -10,6 +10,16 @@ router.route('/auth/signup')
 // /mongodb/auth/login
 router.route('/auth/login')
 .post(mongoLoginUserCtrl)
+
+// /mongodb/user/customers
+router.route('/user/customers')
+.get(mongoGetAllCustomersCtrl)
+
+
+// /mongodb/user/:userId
+router.route('/user/:userId')
+.get(mongoGetUserCtrl)
+
 
 
 // *****Clinic routes*****
@@ -26,6 +36,11 @@ router.route('/clinics/:clinicId')
 .put(mongoUpdateOneClinicCtrl)
 .delete(mongoDeleteOneClinicCrtl)
 
+
+
+
+
+
 // /mongodb/vetcustomers
 router.route('/vetcustomers')
 .get(mongoGetVetCustomersCtrl)
@@ -37,14 +52,9 @@ router.route('/vetcustomers/:customerId')
 .delete(mongoDeleteVetCustomerCtrl)
 
 
+// /mongodb/pets
+router.route('/pets')
+.post(mongoAddPetCtrl);
 
-// /mongodb/user/customers
-router.route('/user/customers')
-.get(mongoGetAllCustomersCtrl)
-
-
-// /mongodb/user/:userId
-router.route('/user/:userId')
-.get(mongoGetUserCtrl)
 
 module.exports = router;

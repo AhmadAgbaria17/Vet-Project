@@ -13,16 +13,7 @@ import CustomerCard from "./components/CustomerCard";
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from 'react-native-toast-message';
-
-interface Customer {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  profileImg: string;
-  phone: string;
-  pets: string[];
-}
+import { Customer } from "../../../interfaces/types"; // Assuming you have a types file for Customer interface
 
 interface VetCustomersScreenProps {
   navigation: any;
@@ -138,7 +129,12 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
       <Text style={styles.titletxt}>Manage Your Customers</Text>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate("VetAddCustomerScreen")}
+        onPress={() => navigation.navigate("VetAddCustomerScreen",{
+          customers,
+          customerRequests,
+          customerWaitingApproval,
+          fetchCustomers,
+        })}
       >
         <Ionicons name="add-circle-outline" size={24} color="white" />
         <Text style={styles.addButtonText}>Add Customer</Text>
@@ -216,7 +212,7 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
                   key={customer._id}
                   customer={customer}
                   onPress={() =>
-                    navigation.navigate("VetClientProfileScreen", { customer })
+                    navigation.navigate("VetClientProfileScreen", customer._id)
                   }
                   onLongPress={() => {
                     Alert.alert(

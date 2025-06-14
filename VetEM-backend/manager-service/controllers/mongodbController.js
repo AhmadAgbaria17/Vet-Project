@@ -30,6 +30,8 @@ module.exports.mongoSignUpUserCtrl = asyncHandler(async (req, res) => {
   }
 });
 
+
+
 /**
  * @desc send to mongodb accessor service to Login user
  * @route mongodb/auth/Login
@@ -54,6 +56,9 @@ module.exports.mongoLoginUserCtrl = asyncHandler(async (req, res) => {
     });
   }
 });
+
+
+
 
 /**
  * @desc send to mongodb accessor service get user by id
@@ -81,6 +86,9 @@ module.exports.mongoGetUserCtrl = asyncHandler(async (req, res) => {
   }
 });
 
+
+
+
 /**
  * @desc send to mongodb accessor service to get all customers 
  * @route mongodb/user/customers
@@ -100,6 +108,9 @@ module.exports.mongoGetAllCustomersCtrl = asyncHandler(async (req, res) => {
     });
   }
 });
+
+
+
 
 /**
  * @desc send to mongodb accessor service to add clinic
@@ -137,6 +148,9 @@ module.exports.mongoAddClinicCtrl = asyncHandler(async (req, res) => {
   }
 });
 
+
+
+
 /**
  * @desc get all the clinics of the user
  * @route mongodb/clinic
@@ -164,6 +178,9 @@ module.exports.mongoGetAllUserClinicsCtrl = asyncHandler(async (req, res) => {
     });
   }
 });
+
+
+
 
 
 
@@ -203,6 +220,9 @@ module.exports.mongoUpdateOneClinicCtrl = asyncHandler(async (req, res) => {
   }
 });
 
+
+
+
 /**
  * @desc Delete one vet clinic
  * @route mongodb/clinic/item/:clinicId
@@ -232,6 +252,8 @@ module.exports.mongoDeleteOneClinicCrtl = asyncHandler(async (req, res) => {
 });
 
 
+
+
 /**
  * @desc get all the customers of the vet clinic
  * @route mongodb/vetcustomers
@@ -259,6 +281,10 @@ module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
     });
   }
 }); 
+
+
+
+
 
 /**
  * @desc add a customer to the vet list of customers
@@ -290,6 +316,10 @@ module.exports.mongoaddcustomertoVetCtrl = asyncHandler(async (req, res) => {
   }
 });
 
+
+
+
+
 /**
  * @desc access a vet customer
  * @route mongodb/vetcustomers/:customerId
@@ -319,6 +349,10 @@ module.exports.mongoAcceptVetCustomerCtrl = asyncHandler(async (req, res) => {
   }
 });
 
+
+
+
+
 /**
  * @desc delete a vet customer
  * @route mongodb/vetcustomers/:customerId
@@ -347,4 +381,42 @@ module.exports.mongoDeleteVetCustomerCtrl = asyncHandler(async (req, res) => {
   }
 });
 
+
+/**
+ * @desc add a pet to the vet clinic
+ * @route mongodb/pets
+ * @method Post
+ * @access private
+ */
+module.exports.mongoAddPetCtrl = asyncHandler(async (req, res) => {
+  const { name, species, breed, age, medicalHistory, ownerId } = req.body;
+  const authToken = req.header("Authorization");
+  try {
+    const response = await axios.post(
+      "http://localhost:5001/pets",
+      {
+        name,
+        species,
+        breed,
+        age,
+        medicalHistory,
+        ownerId,
+      },
+      {
+        headers: {
+          Authorization: authToken,
+        },
+      }
+    );
+    res.status(200).json({
+      message: response.data.message,
+      pet: response.data.pet,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+}
+);
 

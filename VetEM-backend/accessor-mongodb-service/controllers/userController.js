@@ -14,12 +14,12 @@ module.exports.getUserCtrl = asyncHandler(async (req, res)=> {
     const userType = await User.findById(userId).select("userType");
     let user;
     if(userType.userType === "vet"){
-      user = await User.findById(userId).populate("vetInfo.clinics").select("-password -__v -createdAt -updatedAt");
+      user = await User.findById(userId).populate("vetInfo.clinics").select("-password -__v -createdAt -updatedAt -clinicInfo");
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
     }else if(userType.userType === "client"){
-      user = await User.findById(userId).populate("clientInfo.pets").select("-password -__v -createdAt -updatedAt");
+      user = await User.findById(userId).populate("clientInfo.pets").select("-password -__v -createdAt -updatedAt -vetInfo");
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -52,7 +52,7 @@ module.exports.getUserCtrl = asyncHandler(async (req, res)=> {
  */
 module.exports.getAllCustomersCtrl = asyncHandler(async (req, res)=> {
   try {
-    const clients = await User.find({userType:"client"}).select("-password -__v -createdAt -updatedAt -vetInfo");
+    const clients = await User.find({userType:"client"}).populate("clientInfo.pets").select("-password -__v -createdAt -updatedAt -vetInfo");
     if (!clients) {
       return res.status(404).json({ message: "Clients not found" });
     }

@@ -148,7 +148,7 @@ module.exports.getAllClincs = asyncHandler(async (req, res) => {
     console.error("Error get all the clinic", error);
     res
       .status(500)
-      .json({ message: "Error adding clinic", error: error.message });
+      .json({ message: "Error get all the clinic", error: error.message });
   }
 });
 
