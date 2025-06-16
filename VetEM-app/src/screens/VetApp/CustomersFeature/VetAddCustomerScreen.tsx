@@ -75,7 +75,7 @@ const VetAddCustomerScreen = () => {
   const handleInviteCustomer = async (customerId:string) => {
     try {
       const token = await AsyncStorage.getItem("authToken");
-      const response = await axios.post(`http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}`,{},{
+      const response = await axios.post(`http://192.168.10.126:5000/mongodb/user/vet/customers/${customerId}`,{},{
         headers: {
           Authorization: `Bearer ${token}`,
         },

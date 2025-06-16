@@ -11,6 +11,9 @@ router.route('/auth/signup')
 router.route('/auth/login')
 .post(mongoLoginUserCtrl)
 
+
+
+// *****USER routes*****
 // /mongodb/user/customers
 router.route('/user/customers')
 .get(mongoGetAllCustomersCtrl)
@@ -21,13 +24,26 @@ router.route('/user/:userId')
 .get(mongoGetUserCtrl)
 
 
+// /mongodb/user/vetcustomers
+router.route('/user/vet/customers')
+.get(mongoGetVetCustomersCtrl)
+
+// /mongodb/user/vetcustomers/:customerId
+router.route('/user/vet/customers/:customerId')
+.post(mongoaddcustomertoVetCtrl)
+.put(mongoAcceptVetCustomerCtrl)
+.delete(mongoDeleteVetCustomerCtrl)
+
+
+
+
 
 // *****Clinic routes*****
 // /mongodb/clinic
 router.route('/clinic')
 .post(mongoAddClinicCtrl)
 
-// /mongodb/clinic
+// /mongodb/clinics
 router.route('/clinics')
 .get(mongoGetAllUserClinicsCtrl)
 
@@ -41,15 +57,7 @@ router.route('/clinics/:clinicId')
 
 
 
-// /mongodb/vetcustomers
-router.route('/vetcustomers')
-.get(mongoGetVetCustomersCtrl)
 
-// /mongodb/vetcustomers/:customerId
-router.route('/vetcustomers/:customerId')
-.post(mongoaddcustomertoVetCtrl)
-.put(mongoAcceptVetCustomerCtrl)
-.delete(mongoDeleteVetCustomerCtrl)
 
 
 // /mongodb/pets

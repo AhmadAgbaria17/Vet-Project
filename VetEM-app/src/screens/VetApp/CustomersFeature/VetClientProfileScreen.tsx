@@ -7,15 +7,19 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '../../../components/Header';
 import { Customer } from '../../../interfaces/types';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import MedicalHistoryCard from './components/MedicalHistoryCard';
+
 
 interface VetClientProfileScreenProps {
   navigation: any;
   route: {
     params: {
-      customerId: string;
+      userId: string;
     };
   };
 }
@@ -23,11 +27,11 @@ interface VetClientProfileScreenProps {
 
 
 const VetClientProfileScreen = ({ navigation, route }: VetClientProfileScreenProps) => {
-  const { customerId } = route.params;
+  const { userId } = route.params;
   const [loading, setLoading] = useState(true);
   const [customer, setCustomer] = useState<Customer>(
     {
-      _id: customerId,
+      _id: userId,
       firstName: '',
       lastName: '',
       email: '',
@@ -46,9 +50,21 @@ const VetClientProfileScreen = ({ navigation, route }: VetClientProfileScreenPro
   useEffect(() => {
     // Simulate a delay for fetching customer data
     const fetchData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        
+        const token = await AsyncStorage.getItem('authToken');
+        if (!token) return;
+        const response = await axios.get(
+          `http://192.168.10.126:5000/mongodb/user/${userId}` ,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCustomer(response.data.user);
+
+
         
       } catch (error) {
         console.error('Error fetching customer data:', error);
@@ -62,7 +78,7 @@ const VetClientProfileScreen = ({ navigation, route }: VetClientProfileScreenPro
 
 
   const handleAddMedicalRecord = (petId: string) => {
-    navigation.navigate('AddMedicalRecord', { petId, customerId });
+    navigation.navigate('AddMedicalRecord', { petId, userId });
   };
 
   return (
@@ -118,7 +134,10 @@ const VetClientProfileScreen = ({ navigation, route }: VetClientProfileScreenPro
 
                   <View style={styles.medicalHistoryContainer}>
                     <Text style={styles.medicalHistoryTitle}>Medical History</Text>
-                    <Text style={styles.medicalHistoryText}>{}</Text>
+                    <MedicalHistoryCard
+                      medicalHistory={pet.medicalHistory}
+                      petId={pet._id} 
+                      />
                   </View>
                 </View>
               ))}

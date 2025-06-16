@@ -256,15 +256,16 @@ module.exports.mongoDeleteOneClinicCrtl = asyncHandler(async (req, res) => {
 
 /**
  * @desc get all the customers of the vet clinic
- * @route mongodb/vetcustomers
+ * @route mongodb/user/vetcustomers
  * @method Get
  * @access private
  */
 module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
+    console.log("1111")
     const respone = await axios.get(
-      `http://localhost:5001/vetcustomers`,
+      `http://localhost:5001/user/vet/customers`,
       {
         headers: {
           Authorization: authToken,
@@ -275,6 +276,7 @@ module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
       message: respone.data.message,
       customers: respone.data.customers,
     });
+    console.log("2222")
   } catch (error) {
     res.status(500).json({
       message: error.response.data.message,
@@ -297,7 +299,7 @@ module.exports.mongoaddcustomertoVetCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.post(
-      `http://localhost:5001/vetcustomers/${customerId}`,
+      `http://localhost:5001/user/vet/customers/${customerId}`,
       {},
       {
         headers: {
@@ -331,7 +333,7 @@ module.exports.mongoAcceptVetCustomerCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.put(
-      `http://localhost:5001/vetcustomers/${customerId}`,
+      `http://localhost:5001/user/vet/customers/${customerId}`,
       {},
       {
         headers: {
@@ -364,7 +366,7 @@ module.exports.mongoDeleteVetCustomerCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.delete(
-      `http://localhost:5001/vetcustomers/${customerId}`,
+      `http://localhost:5001/user/vet/customers/${customerId}`,
       {
         headers: {
           Authorization: authToken,

@@ -36,7 +36,7 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
       if (!token) return;
       
       const response = await axios.get(
-        `http://192.168.10.126:5000/mongodb/vetcustomers`,
+        `http://192.168.10.126:5000/mongodb/user/vet/customers`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
       if (!token) return;
 
       await axios.put(
-        `http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}`,
+        `http://192.168.10.126:5000/mongodb/user/vet/customers/${customerId}`,
         {},
         {
           headers: {
@@ -97,7 +97,7 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
       if (!token) return;
 
       await axios.delete(
-        `http://192.168.10.126:5000/mongodb/vetcustomers/${customerId}`,
+        `http://192.168.10.126:5000/mongodb/user/vet/customers/${customerId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -212,7 +212,8 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
                   key={customer._id}
                   customer={customer}
                   onPress={() =>
-                    navigation.navigate("VetClientProfileScreen", customer._id)
+                    
+                    navigation.navigate("VetClientProfileScreen", {userId:customer._id})
                   }
                   onLongPress={() => {
                     Alert.alert(

@@ -23,9 +23,6 @@ app.use('/clinic', require('./routes/clinicRoute'));
 // /user/
 app.use('/user', require('./routes/userRoute'));
 
-// /vetcustomers
-app.use('/vetcustomers', require('./routes/vetCustomersRoute'));
-
 // /pets
 app.use('/pets', require('./routes/petRoute'));
 

@@ -20,7 +20,6 @@ export interface Customer {
   lastName: string;
   email: string;
   phone: string;
-  password: string;
   profileImg: string;
 
   clientInfo?: {
