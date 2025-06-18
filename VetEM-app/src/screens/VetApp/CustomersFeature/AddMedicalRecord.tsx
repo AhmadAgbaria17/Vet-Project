@@ -13,21 +13,16 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { RootDrawerParamList } from '../../../navigation/types';
 
-interface AddMedicalRecordProps {
-  navigation: any;
-  route: {
-    params: {
-      petId: string;
-      customerId: string;
-    };
-  };
-}
 
-const AddMedicalRecord = ({ navigation, route }: AddMedicalRecordProps) => {
-  const { petId, customerId } = route.params;
+type AddMedicalRecordProps = DrawerScreenProps<RootDrawerParamList, 'AddMedicalRecord'>; 
+
+const AddMedicalRecord: React.FC<AddMedicalRecordProps> = ({ navigation, route }) => {
+  const { petId } = route.params;
   const [loading, setLoading] = useState(false);
-  const [record, setRecord] = useState({
+  const [medicalRecord, setMedicalRecord] = useState({
     diagnosis: '',
     treatment: '',
     prescription: '',
@@ -35,11 +30,11 @@ const AddMedicalRecord = ({ navigation, route }: AddMedicalRecordProps) => {
   });
 
   const handleSubmit = async () => {
-    if (!record.diagnosis || !record.treatment) {
+    if (!medicalRecord.diagnosis || !medicalRecord.treatment || !medicalRecord.prescription) {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Diagnosis and treatment are required',
+        text2: 'Diagnosis and treatment and prescription are required',
       });
       return;
     }
@@ -48,13 +43,12 @@ const AddMedicalRecord = ({ navigation, route }: AddMedicalRecordProps) => {
     try {
       const token = await AsyncStorage.getItem('authToken');
       if (!token) return;
-
-      await axios.post(
+      
+      await axios.put(
         `http://192.168.10.126:5000/mongodb/pets/${petId}/medical-records`,
-        {
-          ...record,
-          customerId,
-        },
+        
+          {medicalRecord}
+        ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -97,8 +91,8 @@ const AddMedicalRecord = ({ navigation, route }: AddMedicalRecordProps) => {
             <Text style={styles.label}>Diagnosis *</Text>
             <TextInput
               style={styles.input}
-              value={record.diagnosis}
-              onChangeText={(text) => setRecord({ ...record, diagnosis: text })}
+              value={medicalRecord.diagnosis}
+              onChangeText={(text) => setMedicalRecord({ ...medicalRecord, diagnosis: text })}
               placeholder="Enter diagnosis"
               multiline
             />
@@ -108,8 +102,8 @@ const AddMedicalRecord = ({ navigation, route }: AddMedicalRecordProps) => {
             <Text style={styles.label}>Treatment *</Text>
             <TextInput
               style={styles.input}
-              value={record.treatment}
-              onChangeText={(text) => setRecord({ ...record, treatment: text })}
+              value={medicalRecord.treatment}
+              onChangeText={(text) => setMedicalRecord({ ...medicalRecord, treatment: text })}
               placeholder="Enter treatment details"
               multiline
             />
@@ -119,8 +113,8 @@ const AddMedicalRecord = ({ navigation, route }: AddMedicalRecordProps) => {
             <Text style={styles.label}>Prescription</Text>
             <TextInput
               style={styles.input}
-              value={record.prescription}
-              onChangeText={(text) => setRecord({ ...record, prescription: text })}
+              value={medicalRecord.prescription}
+              onChangeText={(text) => setMedicalRecord({ ...medicalRecord, prescription: text })}
               placeholder="Enter prescription details"
               multiline
             />
@@ -130,8 +124,8 @@ const AddMedicalRecord = ({ navigation, route }: AddMedicalRecordProps) => {
             <Text style={styles.label}>Additional Notes</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
-              value={record.notes}
-              onChangeText={(text) => setRecord({ ...record, notes: text })}
+              value={medicalRecord.notes}
+              onChangeText={(text) => setMedicalRecord({ ...medicalRecord, notes: text })}
               placeholder="Enter any additional notes"
               multiline
               numberOfLines={4}

@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { c } = require("docker/src/languages");
 const asyncHandler = require("express-async-handler");
 
 /**
@@ -263,7 +264,6 @@ module.exports.mongoDeleteOneClinicCrtl = asyncHandler(async (req, res) => {
 module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
-    console.log("1111")
     const respone = await axios.get(
       `http://localhost:5001/user/vet/customers`,
       {
@@ -276,7 +276,6 @@ module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
       message: respone.data.message,
       customers: respone.data.customers,
     });
-    console.log("2222")
   } catch (error) {
     res.status(500).json({
       message: error.response.data.message,
@@ -421,4 +420,40 @@ module.exports.mongoAddPetCtrl = asyncHandler(async (req, res) => {
   }
 }
 );
+
+
+/**
+ * @desc send to mongodb to Update the medical records (add a new one)
+ * @route mongofb/pets/:petId/medical-records
+ * @method Put 
+ * @access private
+ */
+module.exports.mongoAddPetMedicalRecCtrl = asyncHandler(async (req,res)=>{
+  const petId = req.params.petId;
+  const authToken = req.header("Authorization");
+  const medicalRecord = req.body;
+  
+  try {
+    const respone = await axios.put(
+      `http://localhost:5001/pets/${petId}/medical-records`,
+      
+      {medicalRecord}
+      ,
+      {
+        headers:{
+          Authorization: authToken
+        }
+      }
+    )
+    res.status(200).json({
+      message: respone.data.message,
+      updatedPet: respone.data.updatedPet,
+    })
+    
+  } catch (error) {
+    res.status(500).json({
+      message: "Error adding medical record",
+    })
+  }
+})
 

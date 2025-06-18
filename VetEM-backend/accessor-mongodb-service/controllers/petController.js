@@ -43,3 +43,31 @@ module.exports.addPet = asyncHandler(async (req, res) => {
   }
 }
 );
+
+
+
+
+/**
+ * @desc Update the medical records (add a new one)
+ * @route /pets/:petId/medical-records
+ * @method Put
+ * @access private
+ */
+module.exports.AddPetMedicalRecCtrl = asyncHandler(async (req,res)=>{
+  const petId = req.params.petId;
+  const  {medicalRecord}  = req.body;
+  try {
+    const pet = await Pet.findById(petId);
+    if(!pet){
+      return res.status(404).json({message: "Pet not found"});
+    }
+    pet.medicalHistory.push(medicalRecord);
+    await pet.save();
+    res.status(200).json({ message: "Medical record added successfully", updatedPet: pet });
+
+    
+  } catch (error) {
+    console.error("Error adding medical record", error);
+    res.status(500).json({ message: "Error adding medical record" });
+  }
+})

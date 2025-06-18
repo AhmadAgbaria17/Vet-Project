@@ -8,7 +8,7 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
-
+app.use(express.json()); 
 
 
 app.use('/mongodb', require('./routes/mongodbRoute'));

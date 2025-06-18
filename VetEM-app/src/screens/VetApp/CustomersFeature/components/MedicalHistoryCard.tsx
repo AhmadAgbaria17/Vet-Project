@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList ,ScrollView} from 'react-native';
 import { MedicalRecord } from '../../../../interfaces/types';
 
 interface MedicalHistoryCardProps {
@@ -20,7 +20,9 @@ const MedicalHistoryCard: React.FC<MedicalHistoryCardProps> = ({medicalHistory,p
 
 
   return (
-    <FlatList
+    <View>
+      <ScrollView>
+              <FlatList
       data={medicalHistory}
       keyExtractor={(_,index)=>`${petId}-${index}`}
       renderItem={({item,index})=>(
@@ -48,6 +50,8 @@ const MedicalHistoryCard: React.FC<MedicalHistoryCardProps> = ({medicalHistory,p
     
     
     />
+      </ScrollView>
+    </View>
   )
 }
 

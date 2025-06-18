@@ -1,4 +1,4 @@
-const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl, mongoAcceptVetCustomerCtrl, mongoDeleteVetCustomerCtrl, mongoAddPetCtrl } = require('../controllers/mongodbController');
+const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl, mongoAcceptVetCustomerCtrl, mongoDeleteVetCustomerCtrl, mongoAddPetCtrl, mongoAddPetMedicalRecCtrl } = require('../controllers/mongodbController');
 
 const router = require('express').Router();
 
@@ -63,6 +63,10 @@ router.route('/clinics/:clinicId')
 // /mongodb/pets
 router.route('/pets')
 .post(mongoAddPetCtrl);
+
+// /mongodb/pets/:petId/medical-records
+router.route('/pets/:petId/medical-records')
+.put(mongoAddPetMedicalRecCtrl);
 
 
 module.exports = router;

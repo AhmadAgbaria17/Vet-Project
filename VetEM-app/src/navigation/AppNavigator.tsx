@@ -21,20 +21,10 @@ import VetQnAScreen from '../screens/VetApp/QnAFeature/VetQnAScreen';
 import NearbyVetsScreen from '../screens/ClientApp/NearbyVetsScreen';
 import MyPetsScreen from '../screens/ClientApp/MyPetsScreen';
 import AppointmentsScreen from '../screens/ClientApp/AppointmentsScreen';
+import { RootDrawerParamList } from './types';
 
-export type RootDrawerParamList = {
-  VetHome: undefined;
-  VetClinics: { user: any };
-  vetCustomers: undefined;
-  VetAddCustomerScreen: undefined;
-  VetClientProfileScreen: { customer: any };
-  AddMedicalRecord: { petId: string; customerId: string };
-  VetQnA: undefined;
-  ClientHome: undefined;
-  NearbyVets: undefined;
-  MyPets: undefined;
-  Appointments: undefined;
-};
+
+
 
 export type DrawerProps = DrawerScreenProps<RootDrawerParamList>;
 

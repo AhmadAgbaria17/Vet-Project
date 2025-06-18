@@ -121,10 +121,7 @@ module.exports.getAllVetCustomersCtrl = asyncHandler(async (req, res)=> {
  * @access private
  */
 module.exports.addcustomertoVetCtrl = asyncHandler(async(req, res) =>{
-  const authToken = req.header("Authorization");
-  if(!authToken){
-    return res.status(401).send("Access denied. No token provided.");
-  }
+
   const customerId = req.params.customerId;
   const vetId = req.user.userId;
 
@@ -140,6 +137,7 @@ module.exports.addcustomertoVetCtrl = asyncHandler(async(req, res) =>{
     customer.clientInfo.clientVetRequests.push(vetId);
 
     vet.vetInfo.vetClientWaitApproval.push(customerId);
+
     await vet.save();
     await customer.save();
     res.status(200).json({message:"customer added to vet's customers list"});
@@ -158,10 +156,7 @@ module.exports.addcustomertoVetCtrl = asyncHandler(async(req, res) =>{
  * @access private
  */
 module.exports.AccepetCustomerReqCtrl = asyncHandler(async(req, res) =>{
-  const authToken = req.header("Authorization");
-  if(!authToken){
-    return res.status(401).send("Access denied. No token provided.");
-  }
+
   const customerId = req.params.customerId;
   const vetId = req.user.userId;
 
