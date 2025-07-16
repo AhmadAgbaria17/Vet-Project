@@ -457,3 +457,146 @@ module.exports.mongoAddPetMedicalRecCtrl = asyncHandler(async (req,res)=>{
   }
 })
 
+
+
+
+/**
+ * @desc get all the questions of a vet
+ * @route mongodb/questions
+ * @method Get
+ * @access private
+ */
+module.exports.mongoGetAllQuestionsByUserCtrl = asyncHandler(async (req, res) => {
+  try {
+    const response = await axios.get(`http://localhost:5001/questions`, {
+      headers: {
+        Authorization: req.header("Authorization"),
+      },
+    });
+    res.status(200).json({
+      message: response.data.message,
+      questions: response.data.questions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+}
+);
+
+/**
+ * @desc update a question answer
+ * @route mongodb/questions/answer/:questionId
+ * @method Put
+ * @access private
+ */ 
+module.exports.mongoUpdtaerQuestionAnswerCtrl = asyncHandler(async (req, res) => {
+  const questionId = req.params.questionId;
+  const { answer } = req.body;
+  const authToken = req.header("Authorization");
+  try {
+    const response = await axios.put(
+      `http://localhost:5001/question/answer/${questionId}`,
+      { answer },
+      {
+        headers: {
+          Authorization: authToken,
+        },
+      }
+    );
+    res.status(200).json({
+      message: response.data.message,
+      question: response.data.question,
+    });
+  }
+  catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+});
+
+
+
+/**
+ * @desc create a new question
+ * @route mongodb/questions
+ * @method Post
+ * @access private
+ */
+module.exports.mongoCreateQuestionCtrl = asyncHandler(async (req, res) => {
+  const { questionText, vetId , petName } = req.body;
+  try {
+    const response = await axios.post("http://localhost:5001/questions", {
+      questionText,
+      vetId,
+      petName,
+    }, {
+      headers: {
+        Authorization: req.header("Authorization"),
+      },
+    });
+    res.status(201).json({
+      message: response.data.message,
+      question: response.data.question,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+});
+
+/**
+ * @desc update a question
+ * @route mongodb/questions/:questionId
+ * @method Put
+ * @access private
+ */
+module.exports.mongoUpdateQuestionCtrl = asyncHandler(async (req, res) => {
+  const questionId = req.params.questionId;
+  const { questionText } = req.body;
+  try {
+    const response = await axios.put(`http://localhost:5001/questions/${questionId}`, {
+      questionText,
+    }, {
+      headers: {
+        Authorization: req.header("Authorization"),
+      },
+    });
+    res.status(200).json({
+      message: response.data.message,
+      question: response.data.question,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+});
+
+/**
+ * @desc delete a question
+ * @route mongodb/questions/:questionId
+ * @method Delete
+ * @access private
+ */
+module.exports.mongoDeleteQuestionCtrl = asyncHandler(async (req, res) => {
+  const questionId = req.params.questionId;
+  try {
+    const response = await axios.delete(`http://localhost:5001/questions/${questionId}`, {
+      headers: {
+        Authorization: req.header("Authorization"),
+      },
+    });
+    res.status(200).json({
+      message: response.data.message,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.response.data.message,
+    });
+  }
+});
+

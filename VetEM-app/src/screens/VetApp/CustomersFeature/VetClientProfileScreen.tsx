@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MedicalHistoryCard from './components/MedicalHistoryCard';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../../../navigation/types';
+import BackButton from '../../../components/BackButton';
 
 
 type VetClientProfileScreenProps = DrawerScreenProps<
@@ -67,7 +68,7 @@ const VetClientProfileScreen: React.FC<VetClientProfileScreenProps> = ({ navigat
   }, [userId]);
 
   const handleAddMedicalRecord = (petId: string) => {
-    navigation.navigate('AddMedicalRecord', { petId, userId });
+    navigation.navigate('AddMedicalRecord', { petId });
   };
 
   return (
@@ -125,6 +126,7 @@ const VetClientProfileScreen: React.FC<VetClientProfileScreenProps> = ({ navigat
           contentContainerStyle={styles.content}
         />
       )}
+      <BackButton navigation={navigation} targetScreen="vetCustomers" />
     </View>
   );
 };

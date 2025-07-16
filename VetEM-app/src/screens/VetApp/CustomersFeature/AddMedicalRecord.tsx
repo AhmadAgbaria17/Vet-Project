@@ -15,6 +15,7 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../../../navigation/types';
+import BackButton from '../../../components/BackButton';
 
 
 type AddMedicalRecordProps = DrawerScreenProps<RootDrawerParamList, 'AddMedicalRecord'>; 
@@ -148,6 +149,7 @@ const AddMedicalRecord: React.FC<AddMedicalRecordProps> = ({ navigation, route }
           </TouchableOpacity>
         </View>
       </ScrollView>
+
     </View>
   );
 };

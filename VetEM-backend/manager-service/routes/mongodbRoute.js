@@ -1,4 +1,4 @@
-const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl, mongoAcceptVetCustomerCtrl, mongoDeleteVetCustomerCtrl, mongoAddPetCtrl, mongoAddPetMedicalRecCtrl } = require('../controllers/mongodbController');
+const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl, mongoAcceptVetCustomerCtrl, mongoDeleteVetCustomerCtrl, mongoAddPetCtrl, mongoAddPetMedicalRecCtrl, mongoCreateQuestionCtrl, mongoUpdateQuestionCtrl, mongoDeleteQuestionCtrl, mongoGetAllQuestionsByUserCtrl, mongoUpdtaerQuestionAnswerCtrl } = require('../controllers/mongodbController');
 
 const router = require('express').Router();
 
@@ -55,11 +55,6 @@ router.route('/clinics/:clinicId')
 
 
 
-
-
-
-
-
 // /mongodb/pets
 router.route('/pets')
 .post(mongoAddPetCtrl);
@@ -67,6 +62,24 @@ router.route('/pets')
 // /mongodb/pets/:petId/medical-records
 router.route('/pets/:petId/medical-records')
 .put(mongoAddPetMedicalRecCtrl);
+
+
+
+// *****Questions routes*****
+
+// /mongodb/questions
+router.route('/questions')
+.post(mongoCreateQuestionCtrl)
+.get(mongoGetAllQuestionsByUserCtrl);
+
+// /mongodb/questions/:questionId
+router.route('/questions/:questionId')
+.put(mongoUpdateQuestionCtrl)
+.delete(mongoDeleteQuestionCtrl);
+
+router.route('/questions/answer/:questionId')
+.put(mongoUpdtaerQuestionAnswerCtrl);
+
 
 
 module.exports = router;

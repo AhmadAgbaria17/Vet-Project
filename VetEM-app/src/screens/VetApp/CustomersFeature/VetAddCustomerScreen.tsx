@@ -5,6 +5,10 @@ import CustomerCard from './components/CustomerCard';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from 'react-native-toast-message';
 import { useRoute, RouteProp } from '@react-navigation/native';
+import BackButton from '../../../components/BackButton';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { RootDrawerParamList } from '../../../navigation/types';
+
 
 
 
@@ -28,9 +32,13 @@ type VetAddCustomerScreenRouteProp = RouteProp<{
   };
 }, 'params'>;
 
+type VetAddCustomerScreenProps = DrawerScreenProps<
+  RootDrawerParamList,
+  'VetAddCustomerScreen'
+>
 
 
-const VetAddCustomerScreen = () => {
+const VetAddCustomerScreen:React.FC<VetAddCustomerScreenProps> = ({navigation}) => {
   const [searchText, setSearchText] = React.useState('');
   const [allCustomers, setAllCustomers] = React.useState<Customer[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -157,6 +165,8 @@ const VetAddCustomerScreen = () => {
           />
 
         )}
+      <BackButton navigation={navigation} targetScreen="vetCustomers" />
+
     </View>
   )
 }

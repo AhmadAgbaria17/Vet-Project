@@ -26,6 +26,9 @@ app.use('/user', require('./routes/userRoute'));
 // /pets
 app.use('/pets', require('./routes/petRoute'));
 
+// /questions
+app.use('/questions', require('./routes/questionRoute'));
+
 
 
 
