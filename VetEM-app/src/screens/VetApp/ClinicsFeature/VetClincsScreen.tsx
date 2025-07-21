@@ -16,21 +16,15 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "../../../components/Header";
+import { Clinic } from "../../../interfaces/types";
+import { DrawerScreenProps } from "@react-navigation/drawer";
+import { RootDrawerParamList } from "../../../navigation/types";
 
-interface Clinic {
-  _id?: string;
-  name: string;
-  openTime: string;
-  location: { latitude: number; longitude: number };
-  userId: string;
-}
 
-interface VetClinicsScreenProps {
-  navigation: any;
-  route: any;
-}
 
-const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
+type VetClinicsScreenProps = DrawerScreenProps<RootDrawerParamList, 'VetClinics'>;
+
+const VetClinicsScreen: React.FC<VetClinicsScreenProps> = ({ navigation, route }) => {
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [clinicId, setClinicId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,6 +32,7 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
   const [openTime, setOpenTime] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [updateLocation, setUpdateLocation] = useState(false);
+  const {user} = route.params || {};
 
 
 // Request location permission and fetch clinics on component mount
@@ -121,7 +116,7 @@ const VetClinicsScreen = ({ navigation, route }: VetClinicsScreenProps) => {
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
         },
-        userId: route.params?.user?.userId,
+        userId: user?.userId || "",
       };
 
       await axios.post(

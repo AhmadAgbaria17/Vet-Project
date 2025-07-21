@@ -461,7 +461,7 @@ module.exports.mongoAddPetMedicalRecCtrl = asyncHandler(async (req,res)=>{
 
 
 /**
- * @desc get all the questions of a vet
+ * @desc get all the questions of a user
  * @route mongodb/questions
  * @method Get
  * @access private
@@ -486,7 +486,7 @@ module.exports.mongoGetAllQuestionsByUserCtrl = asyncHandler(async (req, res) =>
 );
 
 /**
- * @desc update a question answer
+ * @desc update a question answer by the vet
  * @route mongodb/questions/answer/:questionId
  * @method Put
  * @access private
@@ -497,7 +497,7 @@ module.exports.mongoUpdtaerQuestionAnswerCtrl = asyncHandler(async (req, res) =>
   const authToken = req.header("Authorization");
   try {
     const response = await axios.put(
-      `http://localhost:5001/question/answer/${questionId}`,
+      `http://localhost:5001/questions/answer/${questionId}`,
       { answer },
       {
         headers: {
@@ -549,7 +549,7 @@ module.exports.mongoCreateQuestionCtrl = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc update a question
+ * @desc update a question by the customer
  * @route mongodb/questions/:questionId
  * @method Put
  * @access private

@@ -28,5 +28,41 @@ export interface Customer {
     clientVetRequests: Customer[]; 
     clientVetWaitApproval: Customer[]; 
   };
-
 }
+
+export interface JWTUser {
+  firstName: string;
+  userId: string;
+  userType: 'client' | 'vet';
+}
+
+
+
+
+interface UserInfo{
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Question {
+  _id: string;
+  questionText: string;
+  answer?: string;
+  petName: string;
+  customerId: UserInfo;
+  vetId: UserInfo;
+  status: 'pending' | 'answered';
+  createdAt: string;
+}
+
+
+export interface Clinic {
+  _id?: string;
+  name: string;
+  openTime: string;
+  location: { latitude: number; longitude: number };
+  userId: string;
+}
+
+

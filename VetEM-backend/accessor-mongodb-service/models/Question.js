@@ -57,11 +57,22 @@ function validateQuestion(question) {
   const schema = Joi.object({
     questionText: Joi.string().min(5).max(500).required(),
     petName: Joi.string().min(2).max(50).required(),
-    status: Joi.string().valid('pending', 'answered').default('pending'),
+    vetId: Joi.string().required(),
   });
 
   return schema.validate(question);
 }
+
+
+
+function validateUpdateQuestion(question) {
+  const schema = Joi.object({
+    questionText: Joi.string().min(5).max(500).required(),
+  });
+
+  return schema.validate(question);
+}
+
 
 function validateAnswer(answer){
   const schema = Joi.object({
@@ -74,4 +85,5 @@ module.exports ={
   Question,
   validateQuestion,
   validateAnswer,
+  validateUpdateQuestion,
 }

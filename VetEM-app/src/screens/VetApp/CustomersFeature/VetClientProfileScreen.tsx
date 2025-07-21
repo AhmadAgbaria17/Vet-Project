@@ -67,8 +67,8 @@ const VetClientProfileScreen: React.FC<VetClientProfileScreenProps> = ({ navigat
     fetchData();
   }, [userId]);
 
-  const handleAddMedicalRecord = (petId: string) => {
-    navigation.navigate('AddMedicalRecord', { petId });
+  const handleAddMedicalRecord = (petId: string , userId: string) => {
+    navigation.navigate('AddMedicalRecord', { petId , userId });
   };
 
   return (
@@ -111,7 +111,7 @@ const VetClientProfileScreen: React.FC<VetClientProfileScreenProps> = ({ navigat
                 </View>
                 <TouchableOpacity
                   style={styles.addRecordButton}
-                  onPress={() => handleAddMedicalRecord(pet._id)}
+                  onPress={() => handleAddMedicalRecord(pet._id, userId)}
                 >
                   <Ionicons name="add-circle-outline" size={24} color="white" />
                   <Text style={styles.addRecordButtonText}>Add Record</Text>

@@ -1,4 +1,4 @@
-const { getAllQuestionsByVetCtrl, getAllQuestionsByCustomerCtrl, createQuestionCtrl, updateQuestionCtrl, deleteQuestionCtrl, getAllQuestionsByUserCtrl } = require('../controllers/questionController');
+const { getAllQuestionsByVetCtrl, getAllQuestionsByCustomerCtrl, createQuestionCtrl, updateQuestionCtrl, deleteQuestionCtrl, getAllQuestionsByUserCtrl, updateQuestionAnswerCtrl } = require('../controllers/questionController');
 const { verifyToken } = require('../middlewares/authMiddleware');
 
 
@@ -20,6 +20,7 @@ router.route('/:questionId')
 .delete(verifyToken, deleteQuestionCtrl);
 
 // update question answer
+// /questions/answer/:questionId
 router.route('/answer/:questionId')
 .put(verifyToken, updateQuestionAnswerCtrl);
 

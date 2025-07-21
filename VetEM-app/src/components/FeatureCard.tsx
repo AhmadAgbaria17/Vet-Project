@@ -1,9 +1,10 @@
 import React from 'react';
 import {  Text, TouchableOpacity, StyleSheet} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { JWTUser } from '../interfaces/types';
 
 interface FeatureCardProps {
-  user:any,
+  user:JWTUser|null,
   navigation: any,
   pathName: string|undefined,
   iconName: any,

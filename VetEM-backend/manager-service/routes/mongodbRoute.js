@@ -77,6 +77,7 @@ router.route('/questions/:questionId')
 .put(mongoUpdateQuestionCtrl)
 .delete(mongoDeleteQuestionCtrl);
 
+// /mongodb/questions/answer/:questionId
 router.route('/questions/answer/:questionId')
 .put(mongoUpdtaerQuestionAnswerCtrl);
 

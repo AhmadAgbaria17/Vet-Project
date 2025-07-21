@@ -87,7 +87,7 @@ const AppNavigator = () => {
           {/* Vet Screens */}
           {user?.userType === 'vet' && (
             <>
-                <Drawer.Screen name="VetHome" component={VetHomeScreen} />
+                <Drawer.Screen name="vetHome" component={VetHomeScreen} />
                 <Drawer.Screen 
                   name="VetClinics" 
                   component={VetClinicsScreen}

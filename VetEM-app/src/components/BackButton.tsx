@@ -6,15 +6,19 @@ import { Ionicons } from '@expo/vector-icons';
 type BackButtonProps = {
   navigation: any;
   targetScreen: string;
+  userId?: string; // Optional, if needed for navigation
 };
 
 
-const BackButton: React.FC<BackButtonProps> = ({navigation , targetScreen}) => {
+const BackButton: React.FC<BackButtonProps> = ({navigation , targetScreen, userId}) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={()=> navigation.navigate(targetScreen)}
+        onPress={()=> {
+          userId ? navigation.navigate(targetScreen, { userId }) : navigation.navigate(targetScreen);
+        }}
         style={styles.button}
+        
     >
         <Ionicons name="arrow-back" size={20} color="white" />
 

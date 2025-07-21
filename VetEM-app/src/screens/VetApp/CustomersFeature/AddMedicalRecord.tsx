@@ -21,7 +21,7 @@ import BackButton from '../../../components/BackButton';
 type AddMedicalRecordProps = DrawerScreenProps<RootDrawerParamList, 'AddMedicalRecord'>; 
 
 const AddMedicalRecord: React.FC<AddMedicalRecordProps> = ({ navigation, route }) => {
-  const { petId } = route.params;
+  const { petId , userId} = route.params;
   const [loading, setLoading] = useState(false);
   const [medicalRecord, setMedicalRecord] = useState({
     diagnosis: '',
@@ -63,7 +63,8 @@ const AddMedicalRecord: React.FC<AddMedicalRecordProps> = ({ navigation, route }
         text2: 'Medical record added successfully',
       });
 
-      navigation.goBack();
+      navigation.navigate("VetClientProfileScreen", { userId })   
+    
     } catch (error) {
       console.error('Error adding medical record:', error);
       Toast.show({
@@ -149,7 +150,8 @@ const AddMedicalRecord: React.FC<AddMedicalRecordProps> = ({ navigation, route }
           </TouchableOpacity>
         </View>
       </ScrollView>
-
+      <BackButton navigation={navigation} targetScreen="VetClientProfileScreen" userId={userId}/>
+            
     </View>
   );
 };

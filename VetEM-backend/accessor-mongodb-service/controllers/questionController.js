@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const {Question, validateQuestion} = require("../models/Question");
+const {Question, validateQuestion, validateUpdateQuestion, validateAnswer} = require("../models/Question");
 
 
 /**
@@ -28,7 +28,7 @@ module.exports.getAllQuestionsByUserCtrl = asyncHandler(async (req, res) => {
 
 
 /**
- * * @desc Create a new question
+ * * @desc Create a new question by a customer
  * * @route /questions
  * * @method Post
  * * @access private
@@ -42,7 +42,6 @@ module.exports.createQuestionCtrl = asyncHandler(async (req, res) => {
     const newQuestion = await Question.create({
       ...req.body,
       customerId: req.user.userId, 
-      vetId: req.body.vetId, 
     });
     res.status(201).json({
       message: "Question created successfully",
@@ -57,7 +56,7 @@ module.exports.createQuestionCtrl = asyncHandler(async (req, res) => {
 
 
 /**
- * * @desc Update question answer by the vet
+ * * @desc Update the answer question by the vet
  * * @route /questions/answer/:questionId
  * * @method Put
  * * @access private
@@ -98,9 +97,14 @@ module.exports.updateQuestionAnswerCtrl = asyncHandler(async (req, res) => {
  * */
 module.exports.updateQuestionCtrl = asyncHandler(async (req, res) => {
   const questionId = req.params.questionId;
-  const { error } = validateQuestion(req.body);
+  const { error } = validateUpdateQuestion(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
+  }
+  // check the status of the question if it is answered or not
+  const question = await Question.findById(questionId);
+  if(!question || question.status === 'answered'){
+    return res.status(400).json({ message: "You cannot update an answered question" });
   }
   const updatedQuestion = await Question.findByIdAndUpdate(
       questionId,
@@ -123,7 +127,7 @@ module.exports.updateQuestionCtrl = asyncHandler(async (req, res) => {
 
 
 /**
- * * @desc Delete a question
+ * * @desc Delete a question by the customer
  * * @route /questions/:questionId
  * * @method Delete
  * * @access private

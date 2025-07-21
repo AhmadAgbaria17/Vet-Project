@@ -4,28 +4,25 @@ import Header from '../../components/Header';
 import FeatureCard from '../../components/FeatureCard';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode"; 
+import { JWTUser } from '../../interfaces/types';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { RootDrawerParamList } from '../../navigation/types';
 
-interface VetHomeScreenProps {
-  navigation: any,
-}
+type VetHomeScreenProps = DrawerScreenProps<RootDrawerParamList, 'vetHome'>;
 
-interface User {
-  firstName: string;
-  userId: string;
-  userType: 'client' | 'vet' | 'admin';
-}
 
-const VetHomeScreen = ({navigation}:VetHomeScreenProps) => {
-  const [user, setUser] = useState<User|null>(null)
+const VetHomeScreen : React.FC<VetHomeScreenProps> = ({navigation}) => {
+  const [user, setUser] = useState<JWTUser|null>(null)
   const [loading, setLoading] = useState(false);
 
+  // Fetch user info from AsyncStorage
 useEffect(()=>{
     const fetchUserInfo =async()=>{
       try {
         setLoading(true);
         const token = await AsyncStorage.getItem("authToken");
         if(!token) return;
-        const decodedUser = jwtDecode(token) as User;
+        const decodedUser = jwtDecode(token) as JWTUser;
         setUser(decodedUser)
       } catch (error) {
         console.error("Error getting user info:", error);
@@ -37,6 +34,7 @@ useEffect(()=>{
 
   },[])
 
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -47,6 +45,8 @@ useEffect(()=>{
         <Header navigation={navigation}/>
       
         <ScrollView>
+
+          
           {/*welcome section*/}
           <View  style={styles.welcomeSection} >
             <Text  style={styles.welcomeTitle} >
@@ -57,6 +57,8 @@ useEffect(()=>{
             </Text>
           </View>
       
+
+
           {/*Assists Cards*/}
           <View style={styles.featuresSection}>
             <FeatureCard 
