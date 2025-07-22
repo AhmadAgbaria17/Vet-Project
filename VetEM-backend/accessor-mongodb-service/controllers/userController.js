@@ -8,7 +8,6 @@ const asyncHandler = require('express-async-handler');
  * @access private
  */
 module.exports.getUserCtrl = asyncHandler(async (req, res)=> {
-  
   const userId = req.params.userId;
   try {
     const userType = await User.findById(userId).select("userType");
@@ -80,9 +79,7 @@ module.exports.getAllVetCustomersCtrl = asyncHandler(async (req, res)=> {
   if(!authToken){
     return res.status(401).send("Access denied. No token provided.");
   }
-
   const vetId = req.user.userId;
-  console.log(`vetId: ${vetId}`);
   try {
     
     const vet = await User.findById(vetId)
@@ -175,7 +172,7 @@ module.exports.AccepetCustomerReqCtrl = asyncHandler(async(req, res) =>{
     // Add the vet to the customer's vets list
     customer.clientInfo.clientVet.push(vetId);
     
-    // Remove the customer from wait approval list
+    // Remove the customer from request list
     vet.vetInfo.vetClientRequests.pull(customerId);
     
     // Add the customer to the clients list
@@ -218,12 +215,27 @@ module.exports.DeleteCustomervetCtrl = asyncHandler(async(req, res) =>{
       return res.status(404).json({ message: "Vet not found" });
     }
 
-    // Remove the customer from the vet's clients list
-    vet.vetInfo.vetClients.pull(customerId);
-    
-    // Remove the vet from the customer's vets list
-    customer.clientInfo.clientVet.pull(vetId);
-    
+    if(vet.vetInfo.vetClients.includes(customerId)){
+      // Remove the customer from the vet's clients list
+      vet.vetInfo.vetClients.pull(customerId);
+      // Remove the vet from the customer's vets list
+      customer.clientInfo.clientVet.pull(vetId);
+    } 
+
+    if(vet.vetInfo.vetClientRequests.includes(customerId)){
+      // Remove the customer from the vet's client requests list
+      vet.vetInfo.vetClientRequests.pull(customerId);
+      // Remove the vet from the customer's wait approval list
+      customer.clientInfo.clientVetWaitApproval.pull(vetId);
+    }
+
+    if(vet.vetInfo.vetClientWaitApproval.includes(customerId)){
+      // Remove the customer from the vet's wait approval list
+      vet.vetInfo.vetClientWaitApproval.pull(customerId);
+      // Remove the vet from the customer's requests list
+      customer.clientInfo.clientVetRequests.pull(vetId);
+    }
+
     await vet.save();
     await customer.save();
     

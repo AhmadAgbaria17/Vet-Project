@@ -1,4 +1,4 @@
-import React , {useEffect,} from 'react';
+import React , {useEffect,useState} from 'react';
 import { View,Text , StyleSheet,TextInput,ActivityIndicator,FlatList,Alert } from 'react-native';
 import axios from 'axios';
 import CustomerCard from './components/CustomerCard';
@@ -8,27 +8,14 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import BackButton from '../../../components/BackButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../../../navigation/types';
-
-
-
-
-
-interface Customer {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  profileImg: string;
-  phone: string; 
-  pets: string[]; 
-}
+import { Customer } from '../../../interfaces/types';
 
 type VetAddCustomerScreenRouteProp = RouteProp<{
   params: {
     customers: Customer[]; 
     customerRequests: Customer[];
     customerWaitingApproval: Customer[];
-    fetchCustomers: () => Promise<void>; // Function to fetch customers
+    fetchCustomers: () => Promise<void>;
   };
 }, 'params'>;
 
@@ -37,11 +24,10 @@ type VetAddCustomerScreenProps = DrawerScreenProps<
   'VetAddCustomerScreen'
 >
 
-
 const VetAddCustomerScreen:React.FC<VetAddCustomerScreenProps> = ({navigation}) => {
-  const [searchText, setSearchText] = React.useState('');
-  const [allCustomers, setAllCustomers] = React.useState<Customer[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true);
+  const [searchText, setSearchText] = useState('');
+  const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const route = useRoute<VetAddCustomerScreenRouteProp>();
 
   const { customers, customerRequests, customerWaitingApproval ,fetchCustomers} = route.params;
@@ -69,45 +55,16 @@ const VetAddCustomerScreen:React.FC<VetAddCustomerScreenProps> = ({navigation}) 
         setLoading(false);
       }
     }
-  useEffect(()=>{
-    
 
+
+  useEffect(()=>{
     fetchCustomer();
-  },[])
-  
+  },[ customers, customerRequests, customerWaitingApproval ]);
+
   const filterCustomers = allCustomers.filter((customer)=>
     customer.email.toLowerCase().includes(searchText.toLowerCase()) ||
     customer.phone.includes(searchText)
   );
-
-  const handleInviteCustomer = async (customerId:string) => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      const response = await axios.post(`http://192.168.10.126:5000/mongodb/user/vet/customers/${customerId}`,{},{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      } );
-      fetchCustomers?.(); // Refresh the customer list after inviting
-      setAllCustomers(prev =>
-    prev.filter(customer => customer._id !== customerId)
-  );
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: response.data.message,
-      });
-    } catch (error:any) {
-      console.error("Error accepting customer:", error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error.response.data.message,
-      });
-    }
-  };
-
-
 
   return (
     <View style={styles.container}>  
@@ -142,24 +99,9 @@ const VetAddCustomerScreen:React.FC<VetAddCustomerScreenProps> = ({navigation}) 
             renderItem={({ item }) => (
               <CustomerCard
                 customer={item}
-                  onLongPress={() => {
-                                Alert.alert(
-                                  "Customer Invite",
-                                  `do you want to sent invite to ${item.firstName} ${item.lastName}?`,
-                                  [
-                
-                                    {
-                                      text: "Invite",
-                                      onPress: () => handleInviteCustomer(item._id),
-                                      style: "default",
-                                    },
-                                    {
-                                      text: "Cancel",
-                                      style: "cancel"
-                                    }
-                                  ]
-                                )
-                              }}
+                onPress={() => navigation.navigate("VetClientProfileScreen", {userId:item._id})}
+                status='invite'
+                fetchCustomers={fetchCustomers}
               />
             )}
           />

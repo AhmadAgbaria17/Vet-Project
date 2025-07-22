@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -58,91 +57,22 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
     }
   };
 
-  const handleAcceptCustomer = async (customerId: string) => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) return;
 
-      await axios.put(
-        `http://192.168.10.126:5000/mongodb/user/vet/customers/${customerId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
 
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'Customer request accepted',
-      });
 
-      fetchCustomers();
-    } catch (error) {
-      console.error("Error accepting customer:", error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to accept customer request',
-      });
-    }
-  };
-
-  const handleDeleteCustomer = async (customerId: string) => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) return;
-
-      await axios.delete(
-        `http://192.168.10.126:5000/mongodb/user/vet/customers/${customerId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'Customer removed successfully',
-      });
-
-      fetchCustomers();
-    } catch (error) {
-      console.error("Error deleting customer:", error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to remove customer',
-      });
-    }
-  };
 
   return (
     <View style={styles.container}>
       <View style={styles.emptyHeader}></View>
-      <Toast topOffset={70} />
+      <View style={styles.toast}>
+          <Toast/>
+      </View>
       
       {/*Title and Add Customer Button*/}
       <Text style={styles.titletxt}>Manage Your Customers</Text>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate("VetAddCustomerScreen",{
-          customers,
-          customerRequests,
-          customerWaitingApproval,
-          fetchCustomers,
-        })}
-      >
-        <Ionicons name="add-circle-outline" size={24} color="white" />
-        <Text style={styles.addButtonText}>Add Customer</Text>
-      </TouchableOpacity>
-
-
+      
       <ScrollView contentContainerStyle={{ paddingBottom: 15 }}>
+
         {/* Customer Requests Section */}
         {customerRequests.length > 0 && (
           <View>
@@ -155,23 +85,9 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
                 <CustomerCard
                   key={customer._id}
                   customer={customer}
-                  onPress={() => {
-                    Alert.alert(
-                      "Customer Request",
-                      `Accept request from ${customer.firstName} ${customer.lastName}?`,
-                      [
-                        {
-                          text: "Accept",
-                          onPress: () => handleAcceptCustomer(customer._id),
-                          style: "default",
-                        },
-                        {
-                          text: "Cancel",
-                          style: "cancel",
-                        },
-                      ]
-                    );
-                  }}
+                  onPress={() => navigation.navigate("VetClientProfileScreen", {userId:customer._id})}
+                  status="request" 
+                  fetchCustomers={fetchCustomers}
                 />
               ))}
             </View>
@@ -179,7 +95,7 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
           
           </View>
         )}
-
+        
         {/* Waiting Approval Section */}
         {customerWaitingApproval.length > 0 && (
           <View>
@@ -193,8 +109,10 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
                 <CustomerCard
                   key={customer._id}
                   customer={customer}
-                  onPress={() => {}}
                   disabled={true}
+                  status="waiting"
+                  onPress={() => navigation.navigate("VetClientProfileScreen", {userId:customer._id})}
+                  fetchCustomers={fetchCustomers}
                 />
               ))}
             </View>
@@ -213,27 +131,10 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
                 <CustomerCard
                   key={customer._id}
                   customer={customer}
-                  onPress={() =>
-                    
-                    navigation.navigate("VetClientProfileScreen", {userId:customer._id})
-                  }
-                  onLongPress={() => {
-                    Alert.alert(
-                      "Remove Customer",
-                      `Do you want to remove ${customer.firstName} ${customer.lastName}?`,
-                      [
-                        {
-                          text: "Remove",
-                          onPress: () => handleDeleteCustomer(customer._id),
-                          style: "destructive",
-                        },
-                        {
-                          text: "Cancel",
-                          style: "cancel",
-                        },
-                      ]
-                    );
-                  }}
+                  onPress={() => navigation.navigate("VetClientProfileScreen", {userId:customer._id})}
+                  status="current"
+                  fetchCustomers={fetchCustomers}
+              
                 />
               ))}
               {customers.length === 0 && !loading && (
@@ -245,6 +146,20 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
           )}
         </View>
       </ScrollView>
+
+      
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate("VetAddCustomerScreen",{
+          customers,
+          customerRequests,
+          customerWaitingApproval,
+          fetchCustomers,
+        })}
+      >
+        <Ionicons name="add-circle-outline" size={24} color="white" />
+        <Text style={styles.addButtonText}>Add Customer</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -254,6 +169,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 16,
+  },
+  toast:{
+    position:"absolute",
+    top:20,
+    right:200,
+    zIndex:1,
   },
   emptyHeader: {
     height: 30,
@@ -274,8 +195,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#4CAF50",
     padding: 12,
+    
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 50,
   },
   sectionTitle: {
     fontSize: 18,

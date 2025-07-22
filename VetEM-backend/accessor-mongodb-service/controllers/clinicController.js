@@ -137,8 +137,6 @@ module.exports.getAllClincs = asyncHandler(async (req, res) => {
       select:'-userId -__v',
     });
     
-    console.log("user.vetInfo.clinics", user.vetInfo.clinics);
-
     res.status(201).json({
        message: "got all the clinics Successfully",
        UserClinics:user.vetInfo.clinics,

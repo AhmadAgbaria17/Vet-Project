@@ -32,7 +32,7 @@ useEffect(()=>{
     }
     fetchUserInfo();
 
-  },[])
+  },[user])
 
 
   return (
