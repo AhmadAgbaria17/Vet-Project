@@ -30,12 +30,16 @@ const CustomerCard = ({ customer, onPress, onLongPress, disabled = false }: Cust
             </View>
           )}
         </View>
-        <View style={styles.rightContent}>
+        <View style={styles.MiddleContent}>
+      
           <Text style={styles.name}>{customer.firstName} {customer.lastName}</Text>
           <Text style={styles.text}>📧 {customer.email}</Text>
           <Text style={styles.text}>📞 {customer.phone}</Text>
           <Text style={styles.text}>🐾 {customer.clientInfo?.pets.length}</Text>
       
+        </View>
+        <View style={styles.rightContent}>
+          <Ionicons name="chevron-forward-outline" size={24} color="#666" />
         </View>
       </TouchableOpacity>
     </View>
@@ -65,8 +69,11 @@ const styles = StyleSheet.create({
   leftContent: {
     marginRight: 15,
   },
-  rightContent: {
+  MiddleContent: {
     flex: 1,
+  },
+  rightContent: {
+    justifyContent: 'center',
   },
   image: {
     width: 60,

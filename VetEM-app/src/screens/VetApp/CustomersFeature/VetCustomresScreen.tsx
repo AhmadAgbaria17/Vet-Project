@@ -43,7 +43,6 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
           },
         }
       );
-      
       setCustomers(response.data.customers.vetClients);
       setCustomerRequests(response.data.customers.vetClientRequests);
       setCustomerWaitingApproval(response.data.customers.vetClientWaitApproval);
@@ -126,6 +125,8 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
     <View style={styles.container}>
       <View style={styles.emptyHeader}></View>
       <Toast topOffset={70} />
+      
+      {/*Title and Add Customer Button*/}
       <Text style={styles.titletxt}>Manage Your Customers</Text>
       <TouchableOpacity
         style={styles.addButton}
@@ -139,6 +140,7 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
         <Ionicons name="add-circle-outline" size={24} color="white" />
         <Text style={styles.addButtonText}>Add Customer</Text>
       </TouchableOpacity>
+
 
       <ScrollView contentContainerStyle={{ paddingBottom: 15 }}>
         {/* Customer Requests Section */}
