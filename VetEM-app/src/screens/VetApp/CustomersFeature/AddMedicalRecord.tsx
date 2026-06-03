@@ -48,7 +48,7 @@ const AddMedicalRecord: React.FC<AddMedicalRecordProps> = ({ navigation, route }
       await axios.put(
         `http://192.168.10.126:5000/mongodb/pets/${petId}/medical-records`,
         
-          {medicalRecord}
+          medicalRecord
         ,
         {
           headers: {
@@ -61,6 +61,12 @@ const AddMedicalRecord: React.FC<AddMedicalRecordProps> = ({ navigation, route }
         type: 'success',
         text1: 'Success',
         text2: 'Medical record added successfully',
+      });
+      setMedicalRecord({
+        diagnosis: '',
+        treatment: '',
+        prescription: '',
+        notes: '',
       });
 
       navigation.navigate("VetClientProfileScreen", { userId })   
@@ -112,7 +118,7 @@ const AddMedicalRecord: React.FC<AddMedicalRecordProps> = ({ navigation, route }
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Prescription</Text>
+            <Text style={styles.label}>Prescription *</Text>
             <TextInput
               style={styles.input}
               value={medicalRecord.prescription}

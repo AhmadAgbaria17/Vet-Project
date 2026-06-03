@@ -54,14 +54,22 @@ module.exports.addPet = asyncHandler(async (req, res) => {
  * @access private
  */
 module.exports.AddPetMedicalRecCtrl = asyncHandler(async (req,res)=>{
+  
   const petId = req.params.petId;
   const  {medicalRecord}  = req.body;
+  if (!medicalRecord.diagnosis || !medicalRecord.treatment || !medicalRecord.prescription) {
+  return res.status(400).json({ message: "Missing required medical fields" });
+}
   try {
     const pet = await Pet.findById(petId);
     if(!pet){
       return res.status(404).json({message: "Pet not found"});
     }
+    //edit the curren date of the medical record
+    medicalRecord.date = new Date();
     pet.medicalHistory.push(medicalRecord);
+    
+
     await pet.save();
     res.status(200).json({ message: "Medical record added successfully", updatedPet: pet });
 

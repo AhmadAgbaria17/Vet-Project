@@ -37,7 +37,11 @@ const PetSchema = new Schema(
       notes: {
         type: String,
         required: false
-    }
+    },
+      date: {
+        type: Date,
+        default: Date.now
+      }
   }],
     ownerId: {
       type: Schema.Types.ObjectId,

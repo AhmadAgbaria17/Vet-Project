@@ -3,6 +3,7 @@ export interface MedicalRecord {
   treatment: string;
   prescription: string;
   notes?: string;
+  date?: Date;
 }
 
 export interface Pet {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList ,ScrollView} from 'react-native';
 import { MedicalRecord } from '../../../../interfaces/types';
 
@@ -17,6 +17,9 @@ const MedicalHistoryCard: React.FC<MedicalHistoryCardProps> = ({medicalHistory,p
     );
   }
 
+  useEffect(() => {
+    // Any side effects or data fetching can be handled here if needed
+  }, [medicalHistory, petId]);
 
 
   return (
@@ -38,6 +41,8 @@ const MedicalHistoryCard: React.FC<MedicalHistoryCardProps> = ({medicalHistory,p
           <Text style={styles.label}>Prescription:</Text>
           <Text style={styles.value}>{item.prescription}</Text>
 
+          <Text style={styles.label}>Date:</Text>
+          <Text style={styles.value}>{item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}</Text>
           {item.notes ? (
             <>
               <Text style={styles.label}>Notes:</Text>

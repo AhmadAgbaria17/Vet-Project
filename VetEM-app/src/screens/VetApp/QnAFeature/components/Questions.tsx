@@ -14,6 +14,8 @@ interface QuestionsProps {
 }
 
 const Questions = ({questions,setSelectedQuestion}:QuestionsProps) => {
+
+  const [isOpen, setIsOpen] = React.useState(true);
     
   
   const formatDate = (dateString: string) => {
@@ -25,59 +27,113 @@ const Questions = ({questions,setSelectedQuestion}:QuestionsProps) => {
   return (
       <View style={styles.questionsContainer}>
             {questions.map((question) => (
-              <View key={question._id} style={styles.questionCard}>
-                <View style={styles.questionHeader}>
-                  <View>
-                    <Text style={styles.customerName}>Customer: {question.customerId.firstName} {question.customerId.lastName}</Text>
-                    <Text style={styles.petName}>Pet: {question.petName}</Text>
+          <View key={question._id} style={styles.questionCard}>
+                {isOpen ?(
+                  <View >
+                    {question.status === 'answered' && (
+                
+                      <View style={styles.arrow}>
+                        <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
+                          <Ionicons name={"chevron-up" } size={24} color="black" />
+                        </TouchableOpacity>
+                      </View>
+                
+            
+                    )}  
+                    
+                  <View style={styles.questionHeader}>
+                    
+                    <View>
+                      <Text style={styles.customerName}>Customer: {question.customerId.firstName} {question.customerId.lastName}</Text>
+                      <Text style={styles.petName}>Pet: {question.petName}</Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        {
+                          backgroundColor:
+                            question.status === 'answered' ? '#2ecc71' : '#f1c40f',
+                        },
+                      ]}
+                    >
+                      <Text style={styles.statusText}>
+                        {question.status.toUpperCase()}
+                      </Text>
+                    </View>
                   </View>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      {
-                        backgroundColor:
-                          question.status === 'answered' ? '#2ecc71' : '#f1c40f',
-                      },
-                    ]}
-                  >
-                    <Text style={styles.statusText}>
-                      {question.status.toUpperCase()}
-                    </Text>
-                  </View>
+            
+                  <Text style={styles.timestamp}>
+                    Asked on: {formatDate(question.createdAt)}
+                  </Text>
+            
+                  <Text style={styles.questionText}>{question.questionText}</Text>
+            
+                  {question.answer && (
+                    <View style={styles.answerContainer}>
+                      <Text style={styles.answerLabel}>Your Answer:</Text>
+                      <Text style={styles.answerText}>{question.answer}</Text>
+                    </View>
+                  )}
+            
+                  {question.status === 'pending' && (
+                    <TouchableOpacity
+                      style={styles.answerButton}
+                      onPress={() => setSelectedQuestion(question)}
+                    >
+                      <Ionicons name="create-outline" size={20} color="white" />
+                      <Text style={styles.answerButtonText}>Answer</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
-
-                <Text style={styles.timestamp}>
-                  Asked on: {formatDate(question.createdAt)}
-                </Text>
-
-                <Text style={styles.questionText}>{question.questionText}</Text>
-
-                {question.answer && (
-                  <View style={styles.answerContainer}>
-                    <Text style={styles.answerLabel}>Your Answer:</Text>
-                    <Text style={styles.answerText}>{question.answer}</Text>
+                ):(
+                  <View >
+                    {question.status === 'answered' && (
+                <View style={styles.questionHeader}>
+                      <View style={styles.arrow}>
+                        <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
+                          <Ionicons name={"chevron-down" } size={24} color="black" />
+                        </TouchableOpacity>
+                      </View>
+                      <View>
+                        <Text style={styles.customerName}>Customer: {question.customerId.firstName} {question.customerId.lastName}</Text>
+                      </View>
+                </View>
+                    )}
                   </View>
                 )}
-
-                {question.status === 'pending' && (
-                  <TouchableOpacity
-                    style={styles.answerButton}
-                    onPress={() => setSelectedQuestion(question)}
-                  >
-                    <Ionicons name="create-outline" size={20} color="white" />
-                    <Text style={styles.answerButtonText}>Answer</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+          </View>
             ))}
           </View>
   )
 }
 
 const styles = StyleSheet.create( {
-    questionsContainer: {
+
+    arrow:{
+      width: 30,
+      height: 30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      top: -7,
+      right: 2,
+      backgroundColor: 'white',
+      borderRadius: 15,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },  
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      zIndex: 1,
+    },
+
+    
+
+   questionsContainer: {
     gap: 15,
-  },
+    },
   questionCard: {
     backgroundColor: 'white',
     padding: 15,
@@ -106,6 +162,8 @@ const styles = StyleSheet.create( {
     color: '#666',
   },
   statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 15,
