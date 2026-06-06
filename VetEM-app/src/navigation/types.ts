@@ -15,4 +15,5 @@ export type RootDrawerParamList = {
   NearbyVets: undefined;
   MyPets: undefined;
   Appointments: undefined;
+  AskVet: undefined;
 };

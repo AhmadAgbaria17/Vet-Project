@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+
 interface Appointment {
   _id: string;
   clinicId: string;
@@ -66,16 +67,7 @@ const AppointmentsScreen = ({ navigation }: AppointmentsScreenProps) => {
 
   const fetchAppointments = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) return;
-
-      const response = await axios.get('http://192.168.10.126:5000/mongodb/appointments', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setAppointments(response.data.appointments);
+      setAppointments([]);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     } finally {
@@ -111,7 +103,7 @@ const AppointmentsScreen = ({ navigation }: AppointmentsScreenProps) => {
         },
       });
 
-      setClinics(response.data.clinics);
+      setClinics(response.data.clinics || response.data.UserClinics || []);
     } catch (error) {
       console.error('Error fetching clinics:', error);
     }
@@ -119,23 +111,6 @@ const AppointmentsScreen = ({ navigation }: AppointmentsScreenProps) => {
 
   const handleAddAppointment = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) return;
-
-      await axios.post(
-        'http://192.168.10.126:5000/mongodb/appointments',
-        {
-          ...newAppointment,
-          date: newAppointment.date.toISOString().split('T')[0],
-          time: newAppointment.time.toLocaleTimeString(),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
       setModalVisible(false);
       setNewAppointment({
         clinicId: '',

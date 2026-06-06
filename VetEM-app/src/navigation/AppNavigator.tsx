@@ -21,6 +21,7 @@ import VetQnAScreen from '../screens/VetApp/QnAFeature/VetQnAScreen';
 import NearbyVetsScreen from '../screens/ClientApp/NearbyVetsScreen';
 import MyPetsScreen from '../screens/ClientApp/MyPetsScreen';
 import AppointmentsScreen from '../screens/ClientApp/AppointmentsScreen';
+import AskVetScreen from '../screens/ClientApp/AskVetScreen';
 import { RootDrawerParamList } from './types';
 
 
@@ -31,10 +32,10 @@ export type DrawerProps = DrawerScreenProps<RootDrawerParamList>;
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 const Stack = createStackNavigator();
 
-const AuthNavigator = ({setIsLoggedIn}:any ) => (
+const AuthNavigator = ({onLoginSuccess}:any ) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Login">
-      {(props) => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+      {(props) => <LoginScreen {...props} onLoginSuccess={onLoginSuccess} />}
     </Stack.Screen>
     <Stack.Screen name="Signup" component={SignupScreen} />
   </Stack.Navigator>
@@ -44,6 +45,18 @@ const AppNavigator = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleLoginSuccess = (token: string) => {
+    const decodedUser = jwtDecode(token) as any;
+    setUser(decodedUser);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("authToken");
+    setUser(null);
+    setIsLoggedIn(false);
+  };
 
   useEffect(()=>{
     const checkLoginStatus = async () => {
@@ -75,9 +88,10 @@ const AppNavigator = () => {
   
   return (
     <NavigationContainer>
-      {isLoggedIn ? (
+      {isLoggedIn && user ? (
         <Drawer.Navigator 
-        drawerContent={(props)=> <CustomDrawerContent {...props} setIsLoggedIn={setIsLoggedIn} userId={user.userId} />}
+        key={`${user.userType}-${user.userId}`}
+        drawerContent={(props)=> <CustomDrawerContent {...props} onLogout={handleLogout} userId={user.userId} />}
         screenOptions={{
           headerShown: false,
           drawerPosition:'right',
@@ -108,14 +122,16 @@ const AppNavigator = () => {
               <Drawer.Screen name="ClientHome" component={ClientHomeScreen} />
               <Drawer.Screen name="NearbyVets" component={NearbyVetsScreen} />
               <Drawer.Screen name="MyPets" component={MyPetsScreen} />
+              <Drawer.Screen name="AskVet" component={AskVetScreen} />
               <Drawer.Screen name="Appointments" component={AppointmentsScreen} />
+              
             </>
           )}
           
         </Drawer.Navigator>
       ):
       (
-        <AuthNavigator setIsLoggedIn={setIsLoggedIn} />
+        <AuthNavigator onLoginSuccess={handleLoginSuccess} />
       )}
         
     </NavigationContainer>

@@ -23,7 +23,7 @@ const UserSchema = new Schema
       type: String,
       required: [true, 'Please provide your phone number'],
       unique: true,
-      match: [/^\d{10}$/, "Invalid phone number format"],
+      match: [/^\+?\d{7,15}$/, "Invalid phone number format"],
     },
     password:{
       type: String,
@@ -118,8 +118,9 @@ function validateRegisterUser(user){
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
     email: Joi.string().email().required(),
+    phone: Joi.string().pattern(/^\+?\d{7,15}$/).required(),
     password: Joi.string().min(6).required(),
-    userType: Joi.string().valid('client', 'vet', 'admin').required(),
+    userType: Joi.string().valid('client', 'vet').required(),
   });
   return schema.validate(user);
 }

@@ -9,10 +9,10 @@ import { jwtDecode } from "jwt-decode";
 
 interface LoginScreenProps {
   navigation: any,
-  setIsLoggedIn: (value: boolean) => void;
+  onLoginSuccess: (token: string) => void;
 }
 
-const LoginScreen = ({navigation,setIsLoggedIn}:LoginScreenProps) => {
+const LoginScreen = ({navigation,onLoginSuccess}:LoginScreenProps) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,10 +44,7 @@ const LoginScreen = ({navigation,setIsLoggedIn}:LoginScreenProps) => {
 
       const token = response.data.token;
       await AsyncStorage.setItem("authToken",token)
-      const decodedUser = jwtDecode(token);
-      if(decodedUser){
-        setIsLoggedIn(true);
-      }
+      onLoginSuccess(token);
       //wait 1 second 
 
       await new Promise(resolve => setTimeout(resolve, 1000));    

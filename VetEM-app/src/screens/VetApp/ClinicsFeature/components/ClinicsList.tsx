@@ -4,18 +4,15 @@ import {
   Text,
   Alert,
   ActivityIndicator,
-  ScrollView,
-  TextInput,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import Toast from "react-native-toast-message";
 import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
-import { Clinic, JWTUser } from '../../../../interfaces/types';
+import { Clinic } from '../../../../interfaces/types';
 
 interface ClinicsListProps {
   clinics: Clinic[];

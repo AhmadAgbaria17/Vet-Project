@@ -53,7 +53,7 @@ export interface Question {
   petName: string;
   customerId: UserInfo;
   vetId: UserInfo;
-  status: 'pending' | 'answered';
+  status: 'open' | 'answered' | 'closed';
   createdAt: string;
 }
 
@@ -63,7 +63,7 @@ export interface Clinic {
   name: string;
   openTime: string;
   location: { latitude: number; longitude: number };
-  userId: string;
+  userId?: string | (UserInfo & { email?: string; phone?: string });
 }
 
 

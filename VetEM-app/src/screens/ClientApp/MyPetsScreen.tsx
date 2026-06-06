@@ -11,8 +11,9 @@ import {
 } from 'react-native';
 import Header from '../../components/Header';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+
+
 
 interface Pet {
   _id: string;
@@ -20,7 +21,13 @@ interface Pet {
   species: string;
   breed: string;
   age: number;
-  medicalHistory: string;
+  medicalHistory: Array<{
+    diagnosis: string;
+    treatment: string;
+    notes?: string;
+    date?: string;
+    vetName?: string;
+  }>;
 }
 
 interface MyPetsScreenProps {
@@ -36,7 +43,7 @@ const MyPetsScreen = ({ navigation }: MyPetsScreenProps) => {
     species: '',
     breed: '',
     age: '',
-    medicalHistory: '',
+    notes: '',
   });
 
   useEffect(() => {
@@ -45,16 +52,8 @@ const MyPetsScreen = ({ navigation }: MyPetsScreenProps) => {
 
   const fetchPets = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) return;
-
-      const response = await axios.get('http://192.168.10.126:5000/mongodb/pets', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setPets(response.data.pets);
+      const response = await axios.get('http://192.168.10.126:5000/mongodb/pets');
+      setPets(response.data.pets || []);
     } catch (error) {
       console.error('Error fetching pets:', error);
     } finally {
@@ -64,21 +63,10 @@ const MyPetsScreen = ({ navigation }: MyPetsScreenProps) => {
 
   const handleAddPet = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) return;
-
-      await axios.post(
-        'http://192.168.10.126:5000/mongodb/pets',
-        {
-          ...newPet,
-          age: parseInt(newPet.age),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.post('http://192.168.10.126:5000/mongodb/pets', {
+        ...newPet,
+        age: parseInt(newPet.age),
+      });
 
       setModalVisible(false);
       setNewPet({
@@ -86,7 +74,7 @@ const MyPetsScreen = ({ navigation }: MyPetsScreenProps) => {
         species: '',
         breed: '',
         age: '',
-        medicalHistory: '',
+        notes: '',
       });
       fetchPets();
     } catch (error) {
@@ -123,7 +111,16 @@ const MyPetsScreen = ({ navigation }: MyPetsScreenProps) => {
                 <Text style={styles.petInfo}>Species: {pet.species}</Text>
                 <Text style={styles.petInfo}>Breed: {pet.breed}</Text>
                 <Text style={styles.petInfo}>Age: {pet.age} years</Text>
-                <Text style={styles.petInfo}>Medical History: {pet.medicalHistory}</Text>
+                <Text style={styles.petInfo}>
+                  Medical Records: {pet.medicalHistory?.length || 0}
+                </Text>
+                {pet.medicalHistory?.slice(-2).map((record, index) => (
+                  <View key={`${pet._id}-record-${index}`} style={styles.record}>
+                    <Text style={styles.recordTitle}>{record.diagnosis}</Text>
+                    <Text style={styles.petInfo}>{record.treatment}</Text>
+                    {!!record.vetName && <Text style={styles.petInfo}>By {record.vetName}</Text>}
+                  </View>
+                ))}
               </View>
             ))}
           </View>
@@ -171,9 +168,9 @@ const MyPetsScreen = ({ navigation }: MyPetsScreenProps) => {
             
             <TextInput
               style={[styles.input, styles.textArea]}
-              placeholder="Medical History"
-              value={newPet.medicalHistory}
-              onChangeText={(text) => setNewPet({ ...newPet, medicalHistory: text })}
+              placeholder="Notes"
+              value={newPet.notes}
+              onChangeText={(text) => setNewPet({ ...newPet, notes: text })}
               multiline
               numberOfLines={4}
             />
@@ -260,6 +257,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 5,
+  },
+  record: {
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    marginTop: 8,
+    paddingTop: 8,
+  },
+  recordTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 3,
   },
   modalContainer: {
     flex: 1,

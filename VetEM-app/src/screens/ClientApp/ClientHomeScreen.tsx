@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import Header from '../../components/Header';
 import FeatureCard from '../../components/FeatureCard';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -76,6 +76,16 @@ const ClientHomeScreen = ({navigation}:ClientHomeScreenProps) => {
             iconColor={"#e74c3c"}
             textTitle={"Appointments"}
             textCard={"Schedule and manage vet visits"}
+          />
+
+          <FeatureCard
+            user={user}
+            navigation={navigation}
+            pathName={"AskVet"}
+            iconName={'chatbubbles-outline'}
+            iconColor={"#8e44ad"}
+            textTitle={"Ask a Vet"}
+            textCard={"Send questions and view answers"}
           />
         </View>
 

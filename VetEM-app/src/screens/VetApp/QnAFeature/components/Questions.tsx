@@ -75,7 +75,7 @@ const Questions = ({questions,setSelectedQuestion}:QuestionsProps) => {
                     </View>
                   )}
             
-                  {question.status === 'pending' && (
+                  {question.status === 'open' && (
                     <TouchableOpacity
                       style={styles.answerButton}
                       onPress={() => setSelectedQuestion(question)}

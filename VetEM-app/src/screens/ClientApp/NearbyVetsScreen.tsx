@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-nat
 import Header from '../../components/Header';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+
 
 interface NearbyVetsScreenProps {
   navigation: any;
@@ -14,6 +14,7 @@ interface Clinic {
   _id: string;
   name: string;
   openTime: string;
+  distanceKm?: number;
   location: {
     latitude: number;
     longitude: number;
@@ -39,17 +40,14 @@ const NearbyVetsScreen = ({ navigation }: NearbyVetsScreenProps) => {
         let location = await Location.getCurrentPositionAsync({});
         setUserLocation(location);
 
-        // Get nearby clinics
-        const token = await AsyncStorage.getItem('authToken');
-        if (!token) return;
-
         const response = await axios.get('http://192.168.10.126:5000/mongodb/clinics', {
-          headers: {
-            Authorization: `Bearer ${token}`,
+          params: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
           },
         });
 
-        setClinics(response.data.clinics);
+        setClinics(response.data.clinics || response.data.UserClinics || []);
       } catch (error) {
         console.error('Error fetching location or clinics:', error);
       } finally {
@@ -111,6 +109,9 @@ const NearbyVetsScreen = ({ navigation }: NearbyVetsScreenProps) => {
                 <View key={clinic._id} style={styles.clinicCard}>
                   <Text style={styles.clinicName}>{clinic.name}</Text>
                   <Text>Opening Hours: {clinic.openTime}</Text>
+                  {clinic.distanceKm !== undefined && (
+                    <Text>{clinic.distanceKm} km away</Text>
+                  )}
                 </View>
               ))}
             </View>

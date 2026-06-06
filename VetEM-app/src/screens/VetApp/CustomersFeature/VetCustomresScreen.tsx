@@ -33,7 +33,6 @@ const VetCustomresScreen = ({ navigation }: VetCustomersScreenProps) => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) return;
-      
       const response = await axios.get(
         `http://192.168.10.126:5000/mongodb/user/vet/customers`,
         {

@@ -12,6 +12,10 @@ const ClinicSchema = new Schema
     type: String,
     required: true
   },
+  address: {
+    type: String,
+    default: ""
+  },
   openTime: {
     type: String,
     required: true,
@@ -21,6 +25,10 @@ const ClinicSchema = new Schema
       },
       message: "Invalid openTime format. Use HH:MM-HH:MM (e.g., 14:00-19:00)"
     }
+  },
+  contactInfo: {
+    type: String,
+    default: ""
   },
   location: {
     latitude: {
@@ -46,6 +54,7 @@ const Clinic = mongoose.model('Clinic', ClinicSchema);
 function validateClinic(clinic) {
   const schema = Joi.object({
     name: Joi.string().required(),
+    address: Joi.string().allow('').optional(),
     openTime: Joi.string()
       .pattern(/^\d{2}:\d{2}-\d{2}:\d{2}$/)
       .required()
@@ -58,7 +67,8 @@ function validateClinic(clinic) {
         longitude: Joi.number().required()
       })
       .required(),
-    userId: Joi.string().required()
+    contactInfo: Joi.string().allow('').optional(),
+    userId: Joi.string().optional()
   });
   
   return schema.validate(clinic);
@@ -68,9 +78,10 @@ function validateClinic(clinic) {
 function validateUpdateClinic(clinic) {
   const schema = Joi.object({
     name: Joi.string(),
+    address: Joi.string().allow('').optional(),
     openTime: Joi.string()
       .pattern(/^\d{2}:\d{2}-\d{2}:\d{2}$/)
-      .required()
+      .optional()
       .messages({
         "string.pattern.base": "Invalid openTime format. Use HH:MM-HH:MM (e.g., 14:00-19:00)"
       }),
@@ -80,7 +91,8 @@ function validateUpdateClinic(clinic) {
         longitude: Joi.number()
       })
       ,
-    userId: Joi.string()
+    contactInfo: Joi.string().allow('').optional(),
+    userId: Joi.string().optional()
   });
   
   return schema.validate(clinic);

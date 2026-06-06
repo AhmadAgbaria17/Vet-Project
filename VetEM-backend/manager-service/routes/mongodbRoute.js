@@ -1,4 +1,4 @@
-const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl, mongoAcceptVetCustomerCtrl, mongoDeleteVetCustomerCtrl, mongoAddPetCtrl, mongoAddPetMedicalRecCtrl, mongoCreateQuestionCtrl, mongoUpdateQuestionCtrl, mongoDeleteQuestionCtrl, mongoGetAllQuestionsByUserCtrl, mongoUpdtaerQuestionAnswerCtrl } = require('../controllers/mongodbController');
+const { mongoSignUpUserCtrl, mongoLoginUserCtrl, mongoAddClinicCtrl, mongoGetAllUserClinicsCtrl, mongoGetUserCtrl, mongoUpdateOneClinicCtrl, mongoDeleteOneClinicCrtl,mongoGetVetCustomersCtrl, mongoGetAllCustomersCtrl, mongoaddcustomertoVetCtrl, mongoAcceptVetCustomerCtrl, mongoDeleteVetCustomerCtrl, mongoAddPetCtrl, mongoGetPetsCtrl, mongoUpdatePetCtrl, mongoDeletePetCtrl, mongoAddPetMedicalRecCtrl, mongoCreateQuestionCtrl, mongoUpdateQuestionCtrl, mongoDeleteQuestionCtrl, mongoGetAllQuestionsByUserCtrl, mongoUpdtaerQuestionAnswerCtrl } = require('../controllers/mongodbController');
 
 const router = require('express').Router();
 
@@ -57,7 +57,13 @@ router.route('/clinics/:clinicId')
 
 // /mongodb/pets
 router.route('/pets')
+.get(mongoGetPetsCtrl)
 .post(mongoAddPetCtrl);
+
+// /mongodb/pets/:petId
+router.route('/pets/:petId')
+.put(mongoUpdatePetCtrl)
+.delete(mongoDeletePetCtrl);
 
 // /mongodb/pets/:petId/medical-records
 router.route('/pets/:petId/medical-records')

@@ -1,152 +1,125 @@
 const asyncHandler = require("express-async-handler");
 const { Clinic, validateClinic, validateUpdateClinic } = require("../models/Clinic");
 const { User } = require("../models/User");
-const mongoose = require('mongoose');
-const jwt = require("jsonwebtoken");
 
+const toRadians = (value) => (value * Math.PI) / 180;
 
-/**
- * @desc add clinic to DB
- * @route /clinic
- * @method Post
- * @access private
- */
+const calculateDistanceKm = (from, to) => {
+  if (!from || !to) return null;
+  const earthRadiusKm = 6371;
+  const dLat = toRadians(to.latitude - from.latitude);
+  const dLon = toRadians(to.longitude - from.longitude);
+  const lat1 = toRadians(from.latitude);
+  const lat2 = toRadians(to.latitude);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Number((earthRadiusKm * c).toFixed(2));
+};
+
 module.exports.addClinic = asyncHandler(async (req, res) => {
-  try {
-    const { error } = validateClinic(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-    const {name, openTime,location,userId} = req.body;
-    const user= await User.findById(userId);
-    if(!user){
-      return res.status(404).json({ message: "User not found" });
-    }
-    const newClinic = await Clinic.create({
-      name,
-      openTime,
-      location,
-      userId,
-    })
-    await User.findByIdAndUpdate(userId, 
-      {$push: { 'vetInfo.clinics': newClinic._id }},
-      {new: true},
-    );
-    res.status(201).json({
-       message: "Clinic Added Successfully",
-       clinic: newClinic,
-  
-      });
-  } catch (error) {
-    console.error("Error adding clinic", error);
-    res
-      .status(500)
-      .json({ message: "Error adding clinic", error: error.message });
+  const { error } = validateClinic(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
   }
+
+  const vet = await User.findById(req.user.userId);
+  if (!vet || vet.userType !== "vet") {
+    return res.status(403).json({ message: "Only veterinarians can manage clinics" });
+  }
+
+  const clinic = await Clinic.create({
+    name: req.body.name,
+    address: req.body.address || "",
+    openTime: req.body.openTime,
+    contactInfo: req.body.contactInfo || "",
+    location: req.body.location,
+    userId: vet._id,
+  });
+
+  await User.findByIdAndUpdate(vet._id, {
+    $addToSet: { "vetInfo.clinics": clinic._id },
+  });
+
+  res.status(201).json({ message: "Clinic added successfully", clinic });
 });
 
-/**
- * @desc update clinic to DB
- * @route /clinic/item/:clinicId
- * @method Put
- * @access private
- */
 module.exports.updateClinic = asyncHandler(async (req, res) => {
-  try {
-    const {name, openTime,location} = req.body;
-    const clinicId = req.params.clinicId;
-    const { error } = validateUpdateClinic(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-    const clinic = await Clinic.findById(clinicId);
-    if(!clinic){
-      return res.status(404).json({ message: "Clinic not found" });
-      }
-  
-    // update clinic
-    const updatedClinic = await Clinic.findByIdAndUpdate(
-      clinicId,
-      { name , openTime , location},
-      { new: true , runValidators:true }
-    );
-    res.status(200).json({
-       message: "Clinic Updated Successfully",
-       clinic: updatedClinic,
-      });
-  } catch (error) {
-    console.error("Error adding clinic", error);
-    res
-      .status(500)
-      .json({ message: "Error adding clinic", error: error.message });
+  const { error } = validateUpdateClinic(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
   }
+
+  const clinic = await Clinic.findOne({
+    _id: req.params.clinicId,
+    userId: req.user.userId,
+  });
+
+  if (!clinic) {
+    return res.status(404).json({ message: "Clinic not found" });
+  }
+
+  ["name", "address", "openTime", "contactInfo", "location"].forEach((field) => {
+    if (req.body[field] !== undefined) {
+      clinic[field] = req.body[field];
+    }
+  });
+
+  await clinic.save();
+  res.status(200).json({ message: "Clinic updated successfully", clinic });
 });
 
-/**
- * @desc Delete clinic from DB
- * @route /clinic/item/:clinicId
- * @method Delete
- * @access Private
- */
 module.exports.deleteClinic = asyncHandler(async (req, res) => {
-  try {
-    const clinicId = req.params.clinicId;
-    const clinic = await Clinic.findById(clinicId);
-    if(!clinic){
-      return res.status(404).json({ message: "Clinic not found" });
-      }
-      const userId = clinic.userId.toString();
-      await Clinic.findByIdAndDelete(clinicId);
-      await User.findByIdAndUpdate(
-        userId,
-        {$pull: {'vetInfo.clinics': clinicId}},
-        {new : true}
-      );
-      res.status(200).json({ message: "Clinic deleted successfully" });
-    }catch(error){
-      console.error("Error deleting clinic", error);
-      res.status(500).json({ message: "Error deleting clinic" });
-    }
- })
+  const clinic = await Clinic.findOneAndDelete({
+    _id: req.params.clinicId,
+    userId: req.user.userId,
+  });
 
-
-/**
- * @desc get all vet Clinics
- * @route /clinic
- * @method Get
- * @access private
- */
-module.exports.getAllClincs = asyncHandler(async (req, res) => {
-  try {
-
-    const authToken = req.header("Authorization");
-    if (!authToken) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-  
-    const token = authToken.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decodedToken.userId;
-
-    if(!mongoose.Types.ObjectId.isValid(userId)){
-      return res.status(400).json({message:"invalid id"})
+  if (!clinic) {
+    return res.status(404).json({ message: "Clinic not found" });
   }
 
-    const user = await User.findById(userId).populate({
-      path: 'vetInfo.clinics',
-      select:'-userId -__v',
-    });
-    
-    res.status(201).json({
-       message: "got all the clinics Successfully",
-       UserClinics:user.vetInfo.clinics,
-  
-      });
-  } catch (error) {
-    console.error("Error get all the clinic", error);
-    res
-      .status(500)
-      .json({ message: "Error get all the clinic", error: error.message });
-  }
+  await User.findByIdAndUpdate(req.user.userId, {
+    $pull: { "vetInfo.clinics": clinic._id },
+  });
+
+  res.status(200).json({ message: "Clinic deleted successfully" });
 });
 
+module.exports.getAllClincs = asyncHandler(async (req, res) => {
+  const latitude = req.query.latitude ? Number(req.query.latitude) : null;
+  const longitude = req.query.longitude ? Number(req.query.longitude) : null;
+  const origin =
+    Number.isFinite(latitude) && Number.isFinite(longitude)
+      ? { latitude, longitude }
+      : null;
+
+  let clinics;
+  if (req.user.userType === "vet") {
+    clinics = await Clinic.find({ userId: req.user.userId }).sort({ createdAt: -1 });
+  } else {
+    clinics = await Clinic.find({})
+      .populate("userId", "firstName lastName email phone")
+      .sort({ createdAt: -1 });
+  }
+
+  const clinicsWithDistance = clinics
+    .map((clinic) => {
+      const data = clinic.toObject();
+      data.distanceKm = calculateDistanceKm(origin, data.location);
+      return data;
+    })
+    .sort((a, b) => {
+      if (a.distanceKm === null) return 1;
+      if (b.distanceKm === null) return -1;
+      return a.distanceKm - b.distanceKm;
+    });
+
+  res.status(200).json({
+    message: "Clinics fetched successfully",
+    clinics: clinicsWithDistance,
+    UserClinics: clinicsWithDistance,
+  });
+});

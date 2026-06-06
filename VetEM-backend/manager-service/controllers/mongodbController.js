@@ -1,6 +1,13 @@
 const axios = require("axios");
-const { c } = require("docker/src/languages");
 const asyncHandler = require("express-async-handler");
+
+const ACCESSOR_URL = process.env.ACCESSOR_MONGODB_URL || "http://localhost:5001";
+
+const sendAccessorError = (res, error) => {
+  const status = error.response?.status || 500;
+  const message = error.response?.data?.message || "Backend service error";
+  return res.status(status).json({ message });
+};
 
 /**
  * @desc send to mongodb accessor service to sign up user
@@ -12,7 +19,7 @@ module.exports.mongoSignUpUserCtrl = asyncHandler(async (req, res) => {
   const { firstName, lastName, email,phone, password, userType } = req.body;
 
   try {
-    const response = await axios.post("http://localhost:5001/auth/signup", {
+    const response = await axios.post(`${ACCESSOR_URL}/auth/signup`, {
       firstName,
       lastName,
       email,
@@ -25,9 +32,7 @@ module.exports.mongoSignUpUserCtrl = asyncHandler(async (req, res) => {
       message: response.data.message,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    }); 
+    sendAccessorError(res, error);
   }
 });
 
@@ -43,7 +48,7 @@ module.exports.mongoLoginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const response = await axios.post("http://localhost:5001/auth/login", {
+    const response = await axios.post(`${ACCESSOR_URL}/auth/login`, {
       email,
       password,
     });
@@ -52,9 +57,7 @@ module.exports.mongoLoginUserCtrl = asyncHandler(async (req, res) => {
       message: response.data.message,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -71,7 +74,7 @@ module.exports.mongoGetUserCtrl = asyncHandler(async (req, res) => {
   const userId = req.params.userId;
   const authToken = req.header("Authorization");
   try {
-    const response = await axios.get(`http://localhost:5001/user/${userId}`, {
+    const response = await axios.get(`${ACCESSOR_URL}/user/${userId}`, {
       headers: {
         Authorization: authToken,
       },
@@ -81,9 +84,7 @@ module.exports.mongoGetUserCtrl = asyncHandler(async (req, res) => {
       user: response.data.user,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -98,15 +99,18 @@ module.exports.mongoGetUserCtrl = asyncHandler(async (req, res) => {
  */
 module.exports.mongoGetAllCustomersCtrl = asyncHandler(async (req, res) => {
   try {
-    const response = await axios.get(`http://localhost:5001/user/customers`);
+    const response = await axios.get(`${ACCESSOR_URL}/user/customers`, {
+      headers: {
+        Authorization: req.header("Authorization"),
+      },
+      params: req.query,
+    });
     res.status(200).json({
       message: response.data.message,
       customers: response.data.customers,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -125,7 +129,7 @@ module.exports.mongoAddClinicCtrl = asyncHandler(async (req, res) => {
   try {
     
     const respone = await axios.post(
-      "http://localhost:5001/clinic",
+      `${ACCESSOR_URL}/clinic`,
       {
         name,
         openTime,
@@ -143,9 +147,7 @@ module.exports.mongoAddClinicCtrl = asyncHandler(async (req, res) => {
       clinic: respone.data.clinic,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -160,11 +162,12 @@ module.exports.mongoAddClinicCtrl = asyncHandler(async (req, res) => {
  */
 module.exports.mongoGetAllUserClinicsCtrl = asyncHandler(async (req, res) => {
   try {
-    const respone = await axios.get(`http://localhost:5001/clinic`,
+    const respone = await axios.get(`${ACCESSOR_URL}/clinic`,
       {
         headers: {
           Authorization: req.header("Authorization"),
         },
+        params: req.query,
       }
     );
 
@@ -172,11 +175,10 @@ module.exports.mongoGetAllUserClinicsCtrl = asyncHandler(async (req, res) => {
     res.status(200).json({
       message: respone.data.message,
       UserClinics: respone.data.UserClinics,
+      clinics: respone.data.clinics,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -197,7 +199,7 @@ module.exports.mongoUpdateOneClinicCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.put(
-      `http://localhost:5001/clinic/${clinicId}`,
+      `${ACCESSOR_URL}/clinic/${clinicId}`,
       {
         name,
         openTime,
@@ -215,9 +217,7 @@ module.exports.mongoUpdateOneClinicCtrl = asyncHandler(async (req, res) => {
       clinic: respone.data.clinic,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -235,7 +235,7 @@ module.exports.mongoDeleteOneClinicCrtl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.delete(
-      `http://localhost:5001/clinic/${clinicId}`,
+      `${ACCESSOR_URL}/clinic/${clinicId}`,
       {
         headers: {
           Authorization: authToken,
@@ -246,9 +246,7 @@ module.exports.mongoDeleteOneClinicCrtl = asyncHandler(async (req, res) => {
       message: respone.data.message,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -265,7 +263,7 @@ module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.get(
-      `http://localhost:5001/user/vet/customers`,
+      `${ACCESSOR_URL}/user/vet/customers`,
       {
         headers: {
           Authorization: authToken,
@@ -277,9 +275,7 @@ module.exports.mongoGetVetCustomersCtrl = asyncHandler(async (req, res) => {
       customers: respone.data.customers,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 }); 
 
@@ -298,7 +294,7 @@ module.exports.mongoaddcustomertoVetCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.post(
-      `http://localhost:5001/user/vet/customers/${customerId}`,
+      `${ACCESSOR_URL}/user/vet/customers/${customerId}`,
       {},
       {
         headers: {
@@ -311,9 +307,7 @@ module.exports.mongoaddcustomertoVetCtrl = asyncHandler(async (req, res) => {
       message: respone.data.message,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -332,7 +326,7 @@ module.exports.mongoAcceptVetCustomerCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.put(
-      `http://localhost:5001/user/vet/customers/${customerId}`,
+      `${ACCESSOR_URL}/user/vet/customers/${customerId}`,
       {},
       {
         headers: {
@@ -344,9 +338,7 @@ module.exports.mongoAcceptVetCustomerCtrl = asyncHandler(async (req, res) => {
       message: respone.data.message,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -365,7 +357,7 @@ module.exports.mongoDeleteVetCustomerCtrl = asyncHandler(async (req, res) => {
   const authToken = req.header("Authorization");
   try {
     const respone = await axios.delete(
-      `http://localhost:5001/user/vet/customers/${customerId}`,
+      `${ACCESSOR_URL}/user/vet/customers/${customerId}`,
       {
         headers: {
           Authorization: authToken,
@@ -376,9 +368,7 @@ module.exports.mongoDeleteVetCustomerCtrl = asyncHandler(async (req, res) => {
       message: respone.data.message,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -390,18 +380,20 @@ module.exports.mongoDeleteVetCustomerCtrl = asyncHandler(async (req, res) => {
  * @access private
  */
 module.exports.mongoAddPetCtrl = asyncHandler(async (req, res) => {
-  const { name, species, breed, age, medicalHistory, ownerId } = req.body;
+  const { name, species, breed, age, birthDate, gender, image, notes } = req.body;
   const authToken = req.header("Authorization");
   try {
     const response = await axios.post(
-      "http://localhost:5001/pets",
+      `${ACCESSOR_URL}/pets`,
       {
         name,
         species,
         breed,
         age,
-        medicalHistory,
-        ownerId,
+        birthDate,
+        gender,
+        image,
+        notes,
       },
       {
         headers: {
@@ -414,12 +406,57 @@ module.exports.mongoAddPetCtrl = asyncHandler(async (req, res) => {
       pet: response.data.pet,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 }
 );
+
+module.exports.mongoGetPetsCtrl = asyncHandler(async (req, res) => {
+  try {
+    const response = await axios.get(`${ACCESSOR_URL}/pets`, {
+      headers: {
+        Authorization: req.header("Authorization"),
+      },
+    });
+    res.status(200).json({
+      message: response.data.message,
+      pets: response.data.pets,
+    });
+  } catch (error) {
+    sendAccessorError(res, error);
+  }
+});
+
+module.exports.mongoUpdatePetCtrl = asyncHandler(async (req, res) => {
+  try {
+    const response = await axios.put(`${ACCESSOR_URL}/pets/${req.params.petId}`, req.body, {
+      headers: {
+        Authorization: req.header("Authorization"),
+      },
+    });
+    res.status(200).json({
+      message: response.data.message,
+      pet: response.data.pet,
+    });
+  } catch (error) {
+    sendAccessorError(res, error);
+  }
+});
+
+module.exports.mongoDeletePetCtrl = asyncHandler(async (req, res) => {
+  try {
+    const response = await axios.delete(`${ACCESSOR_URL}/pets/${req.params.petId}`, {
+      headers: {
+        Authorization: req.header("Authorization"),
+      },
+    });
+    res.status(200).json({
+      message: response.data.message,
+    });
+  } catch (error) {
+    sendAccessorError(res, error);
+  }
+});
 
 
 /**
@@ -435,7 +472,7 @@ module.exports.mongoAddPetMedicalRecCtrl = asyncHandler(async (req,res)=>{
   
   try {
     const respone = await axios.put(
-      `http://localhost:5001/pets/${petId}/medical-records`,
+      `${ACCESSOR_URL}/pets/${petId}/medical-records`,
       
       {medicalRecord}
       ,
@@ -451,9 +488,7 @@ module.exports.mongoAddPetMedicalRecCtrl = asyncHandler(async (req,res)=>{
     })
     
   } catch (error) {
-    res.status(500).json({
-      message: "Error adding medical record",
-    })
+    sendAccessorError(res, error);
   }
 })
 
@@ -468,7 +503,7 @@ module.exports.mongoAddPetMedicalRecCtrl = asyncHandler(async (req,res)=>{
  */
 module.exports.mongoGetAllQuestionsByUserCtrl = asyncHandler(async (req, res) => {
   try {
-    const response = await axios.get(`http://localhost:5001/questions`, {
+    const response = await axios.get(`${ACCESSOR_URL}/questions`, {
       headers: {
         Authorization: req.header("Authorization"),
       },
@@ -478,9 +513,7 @@ module.exports.mongoGetAllQuestionsByUserCtrl = asyncHandler(async (req, res) =>
       questions: response.data.questions,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 }
 );
@@ -497,7 +530,7 @@ module.exports.mongoUpdtaerQuestionAnswerCtrl = asyncHandler(async (req, res) =>
   const authToken = req.header("Authorization");
   try {
     const response = await axios.put(
-      `http://localhost:5001/questions/answer/${questionId}`,
+      `${ACCESSOR_URL}/questions/answer/${questionId}`,
       { answer },
       {
         headers: {
@@ -511,9 +544,7 @@ module.exports.mongoUpdtaerQuestionAnswerCtrl = asyncHandler(async (req, res) =>
     });
   }
   catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -526,12 +557,13 @@ module.exports.mongoUpdtaerQuestionAnswerCtrl = asyncHandler(async (req, res) =>
  * @access private
  */
 module.exports.mongoCreateQuestionCtrl = asyncHandler(async (req, res) => {
-  const { questionText, vetId , petName } = req.body;
+  const { questionText, vetId, petName, petId } = req.body;
   try {
-    const response = await axios.post("http://localhost:5001/questions", {
+    const response = await axios.post(`${ACCESSOR_URL}/questions`, {
       questionText,
       vetId,
       petName,
+      petId,
     }, {
       headers: {
         Authorization: req.header("Authorization"),
@@ -542,9 +574,7 @@ module.exports.mongoCreateQuestionCtrl = asyncHandler(async (req, res) => {
       question: response.data.question,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -556,10 +586,12 @@ module.exports.mongoCreateQuestionCtrl = asyncHandler(async (req, res) => {
  */
 module.exports.mongoUpdateQuestionCtrl = asyncHandler(async (req, res) => {
   const questionId = req.params.questionId;
-  const { questionText } = req.body;
+  const { questionText, petName, petId } = req.body;
   try {
-    const response = await axios.put(`http://localhost:5001/questions/${questionId}`, {
+    const response = await axios.put(`${ACCESSOR_URL}/questions/${questionId}`, {
       questionText,
+      petName,
+      petId,
     }, {
       headers: {
         Authorization: req.header("Authorization"),
@@ -570,9 +602,7 @@ module.exports.mongoUpdateQuestionCtrl = asyncHandler(async (req, res) => {
       question: response.data.question,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 
@@ -585,7 +615,7 @@ module.exports.mongoUpdateQuestionCtrl = asyncHandler(async (req, res) => {
 module.exports.mongoDeleteQuestionCtrl = asyncHandler(async (req, res) => {
   const questionId = req.params.questionId;
   try {
-    const response = await axios.delete(`http://localhost:5001/questions/${questionId}`, {
+    const response = await axios.delete(`${ACCESSOR_URL}/questions/${questionId}`, {
       headers: {
         Authorization: req.header("Authorization"),
       },
@@ -594,9 +624,7 @@ module.exports.mongoDeleteQuestionCtrl = asyncHandler(async (req, res) => {
       message: response.data.message,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.response.data.message,
-    });
+    sendAccessorError(res, error);
   }
 });
 

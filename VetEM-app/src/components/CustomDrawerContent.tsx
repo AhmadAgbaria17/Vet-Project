@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // To mana
 interface CustomDrawerContentProps {
   userId: string,
   navigation: any,
-  setIsLoggedIn: (value: boolean) => void;
+  onLogout: () => Promise<void>;
 }
 
 interface User {
@@ -17,7 +17,7 @@ interface User {
   profileImg: string;
 }
 
-const CustomDrawerContent = ({userId, navigation,setIsLoggedIn}:CustomDrawerContentProps) => {
+const CustomDrawerContent = ({userId, navigation,onLogout}:CustomDrawerContentProps) => {
 
   const [user, setUser] = React.useState<User|null>(null);
 
@@ -48,8 +48,7 @@ const CustomDrawerContent = ({userId, navigation,setIsLoggedIn}:CustomDrawerCont
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem("authToken");
-      setIsLoggedIn(false);     
+      await onLogout();
     } catch (error) {
       console.error("Error logging out:", error);
     }

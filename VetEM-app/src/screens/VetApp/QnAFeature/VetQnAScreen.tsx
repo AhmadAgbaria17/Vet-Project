@@ -4,8 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  TextInput,
   ActivityIndicator,
 } from 'react-native';
 import Header from '../../../components/Header';
@@ -36,7 +34,7 @@ const VetQnAScreen = ({ navigation }: VetQnAScreenProps) => {
   const fetchQuestions = async () => {
     try {
 
-      const token = await AsyncStorage.getItem('authToken');
+      const token = await AsyncStorage.getItem("authToken");
       if (!token) return;
 
       const response = await axios.get('http://192.168.10.126:5000/mongodb/questions', {
@@ -71,8 +69,9 @@ const VetQnAScreen = ({ navigation }: VetQnAScreenProps) => {
 
     setAnswering(true);
     try {
-      const token = await AsyncStorage.getItem('authToken');
+      const token = await AsyncStorage.getItem("authToken");
       if (!token) return;
+
       await axios.put(
         `http://192.168.10.126:5000/mongodb/questions/answer/${selectedQuestion._id}`,
         { answer },

@@ -1,19 +1,22 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
-const {User} = require("../models/User");
+const {User, validateRegisterUser} = require("../models/User");
 const nodeMailer = require("nodemailer");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken")
 
 
 // NodeMailer Transporter setup
-const transport = nodeMailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.APP_EMAIL_ADDRESS,
-    pass: process.env.APP_EMAIL_PASSWORD,
-  },
-});
+const mailEnabled = Boolean(process.env.APP_EMAIL_ADDRESS && process.env.APP_EMAIL_PASSWORD);
+const transport = mailEnabled
+  ? nodeMailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.APP_EMAIL_ADDRESS,
+        pass: process.env.APP_EMAIL_PASSWORD,
+      },
+    })
+  : null;
 
 
 
@@ -27,10 +30,16 @@ const transport = nodeMailer.createTransport({
  */
 module.exports.signUpUserCtrl = asyncHandler(async (req,res)=>{
   try {
+    const { error } = validateRegisterUser(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const {firstName,lastName,email,phone,password, userType} = req.body;
+    const emailLower = email.toLowerCase();
 
     //checek if user exists
-    const existingUser = await User.findOne({email});
+    const existingUser = await User.findOne({ $or: [{ email: emailLower }, { phone }] });
     if(existingUser){
       return res.status(400).json({message:"User already exists"});
     }
@@ -42,9 +51,6 @@ module.exports.signUpUserCtrl = asyncHandler(async (req,res)=>{
     //Generate verification token
     const accountVerificationToken = crypto.randomBytes(32).toString("hex");
 
-    //change email to lower case 
-    const emailLower = email.toLowerCase();
-
     //create user
     const newUser = new User({
       firstName,
@@ -54,7 +60,7 @@ module.exports.signUpUserCtrl = asyncHandler(async (req,res)=>{
       password:hashedPassword,
       userType,
       accountVerificationToken,
-      isAccountVerified: false,
+      isAccountVerified: !mailEnabled,
     });
 
     if(userType === "vet"){
@@ -67,18 +73,21 @@ module.exports.signUpUserCtrl = asyncHandler(async (req,res)=>{
 
     await newUser.save()
 
-    //send verification email
-    const verificationLink = `http://localhost:5001/auth/verify-email?token=${accountVerificationToken}`;
-    const mailOptions = {
-      from: process.env.APP_EMAIL_ADDRESS,
-      to: email,
-      subject: "Account Verification",
-      text: `Click on this link to verify your account: ${verificationLink}`,
-    };
+    if (mailEnabled) {
+      const verificationLink = `http://localhost:5001/auth/verify-email?token=${accountVerificationToken}`;
+      await transport.sendMail({
+        from: process.env.APP_EMAIL_ADDRESS,
+        to: email,
+        subject: "Account Verification",
+        text: `Click on this link to verify your account: ${verificationLink}`,
+      });
+    }
 
-    await transport.sendMail(mailOptions);
-
-    res.status(201).json({message: "Signup successful! Please verify your email before logging in."});
+    res.status(201).json({
+      message: mailEnabled
+        ? "Signup successful! Please verify your email before logging in."
+        : "Signup successful! You can log in now.",
+    });
 
   } catch (error) {
     console.log("signup Error: ", error);
@@ -119,7 +128,7 @@ module.exports.loginUserCtrl = asyncHandler(async (req, res) => {
     }
 
     //Generate JWT Token
-    const token = jwt.sign({userId: user._id, firstName:user.firstName ,userType:user.userType},process.env.JWT_SECRET,{
+    const token = jwt.sign({userId: user._id, firstName:user.firstName, lastName:user.lastName, email:user.email, userType:user.userType},process.env.JWT_SECRET,{
       expiresIn:"7d",
     })
 

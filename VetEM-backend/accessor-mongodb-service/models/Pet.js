@@ -19,7 +19,24 @@ const PetSchema = new Schema(
     },
     age: {
       type: Number,
-      required: true
+      required: false
+    },
+    birthDate: {
+      type: Date,
+      required: false
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'unknown'],
+      default: 'unknown'
+    },
+    image: {
+      type: String,
+      default: ''
+    },
+    notes: {
+      type: String,
+      default: ''
     },
     medicalHistory:[{
       diagnosis:{
@@ -32,7 +49,16 @@ const PetSchema = new Schema(
       },
       prescription:{
         type: String,
-        required: true
+        required: false
+      },
+      vetId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: false
+      },
+      vetName: {
+        type: String,
+        required: false
       },
       notes: {
         type: String,
@@ -58,19 +84,12 @@ function validatePet(pet) {
   const schema = Joi.object({
     name: Joi.string().required(),
     species: Joi.string().required(),
-    breed: Joi.string().required(),
-    age: Joi.number().required(),
-medicalHistory: Joi.array()
-  .items(
-    Joi.object({
-      diagnosis: Joi.string().required(),
-      treatment: Joi.string().required(),
-      prescription: Joi.string().required(),
-      notes: Joi.string().allow('').optional()
-    })
-  )
-  .required(),
-    ownerId: Joi.string().required()
+    breed: Joi.string().allow('').optional(),
+    age: Joi.number().min(0).optional(),
+    birthDate: Joi.date().optional(),
+    gender: Joi.string().valid('male', 'female', 'unknown').optional(),
+    image: Joi.string().allow('').optional(),
+    notes: Joi.string().allow('').optional()
   });
 
   return schema.validate(pet);
@@ -81,14 +100,11 @@ function validatePetUpdate(pet) {
     name: Joi.string().optional(),
     species: Joi.string().optional(),
     breed: Joi.string().optional(),
-    age: Joi.number().optional(),
-    medicalHistory: Joi.object({
-      diagnosis: Joi.string().optional(),
-      treatment: Joi.string().optional(),
-      prescription: Joi.string().optional(),
-      notes: Joi.string().optional()
-    }).optional(),
-    ownerId: Joi.string().optional()
+    age: Joi.number().min(0).optional(),
+    birthDate: Joi.date().optional(),
+    gender: Joi.string().valid('male', 'female', 'unknown').optional(),
+    image: Joi.string().allow('').optional(),
+    notes: Joi.string().allow('').optional()
   });
 
   return schema.validate(pet);

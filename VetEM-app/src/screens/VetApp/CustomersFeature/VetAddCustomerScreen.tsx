@@ -1,9 +1,9 @@
 import React , {useEffect,useState} from 'react';
-import { View,Text , StyleSheet,TextInput,ActivityIndicator,FlatList,Alert } from 'react-native';
+import { View,Text , StyleSheet,TextInput,ActivityIndicator,FlatList } from 'react-native';
 import axios from 'axios';
 import CustomerCard from './components/CustomerCard';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from 'react-native-toast-message';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRoute, RouteProp } from '@react-navigation/native';
 import BackButton from '../../../components/BackButton';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -43,7 +43,15 @@ const VetAddCustomerScreen:React.FC<VetAddCustomerScreenProps> = ({navigation}) 
         ];
 
 
-      const response = await axios.get(`http://192.168.10.126:5000/mongodb/user/customers`);
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) return;
+
+      const response = await axios.get(`http://192.168.10.126:5000/mongodb/user/customers`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: searchText.trim() ? { search: searchText.trim() } : undefined,
+      });
       const filteredCustomers = response.data.customers.filter((customer: Customer) => {
         return !allExcludedIds.includes(customer._id);
       });
@@ -58,10 +66,16 @@ const VetAddCustomerScreen:React.FC<VetAddCustomerScreenProps> = ({navigation}) 
 
 
   useEffect(()=>{
-    fetchCustomer();
-  },[ customers, customerRequests, customerWaitingApproval ]);
+    const timeoutId = setTimeout(() => {
+      fetchCustomer();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  },[ customers, customerRequests, customerWaitingApproval, searchText ]);
 
   const filterCustomers = allCustomers.filter((customer)=>
+    customer.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
+    customer.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
     customer.email.toLowerCase().includes(searchText.toLowerCase()) ||
     customer.phone.includes(searchText)
   );

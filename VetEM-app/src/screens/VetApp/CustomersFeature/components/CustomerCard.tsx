@@ -109,7 +109,7 @@ const [IsInvited, setIsInvited] = useState<boolean>(false);
           Toast.show({
             type: 'error',
             text1: 'Error',
-            text2: error.response.data.message,
+            text2: error.response?.data?.message || 'Failed to invite customer',
           });
         } 
       };
@@ -134,9 +134,9 @@ const [IsInvited, setIsInvited] = useState<boolean>(false);
         <View style={styles.MiddleContent}>
       
           <Text style={styles.name}>{customer.firstName} {customer.lastName}</Text>
-          <Text style={styles.text}>📧 {customer.email}</Text>
-          <Text style={styles.text}>📞 {customer.phone}</Text>
-          <Text style={styles.text}>🐾 {customer.clientInfo?.pets.length}</Text>
+          <Text style={styles.text}>Email: {customer.email}</Text>
+          <Text style={styles.text}>Phone: {customer.phone}</Text>
+          <Text style={styles.text}>Pets: {customer.clientInfo?.pets?.length || 0}</Text>
 
             {status === 'invite'  && IsInvited &&  (
             <Text style={styles.invitedText }>{customer.firstName} {customer.lastName} is successfully invited</Text>  

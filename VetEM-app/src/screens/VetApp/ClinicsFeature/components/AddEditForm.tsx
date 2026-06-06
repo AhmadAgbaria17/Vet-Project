@@ -8,10 +8,10 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import Toast from "react-native-toast-message";
-import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { Clinic, JWTUser } from '../../../../interfaces/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 interface AddEditFormProps {
   name: string;
@@ -62,9 +62,6 @@ const AddEditForm = ({
         return;
       }
 
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) return;
-
       const newClinic: Clinic = {
         name,
         openTime,
@@ -72,11 +69,13 @@ const AddEditForm = ({
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
         },
-        userId: user?.userId || "",
       };
 
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) return;
+
       await axios.post(
-        "http://192.168.10.126:5000/mongodb/clinic",
+        `http://192.168.10.126:5000/mongodb/clinics`,
         newClinic,
         {
           headers: {
@@ -116,9 +115,6 @@ const AddEditForm = ({
     }
 
     try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) return;
-
       let updatedClinic: Partial<Clinic> = {
         name,
         openTime,
@@ -133,6 +129,9 @@ const AddEditForm = ({
           };
         }
       }
+
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) return;
 
       await axios.put(
         `http://192.168.10.126:5000/mongodb/clinics/${clinicId}`,

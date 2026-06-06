@@ -2,11 +2,8 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   Alert,
-  ActivityIndicator,
-  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import * as Location from "expo-location";

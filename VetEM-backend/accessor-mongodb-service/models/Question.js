@@ -18,9 +18,14 @@ const QuestionSchema = new Schema(
     },
     petName:{
       type: String,
-      required: [true, 'Pet name is required'],
+      required: false,
       minlength: 2,
       maxlength: 50,
+    },
+    petId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Pet',
+      required: false,
     },
     customerId: {
       type: Schema.Types.ObjectId,
@@ -34,8 +39,8 @@ const QuestionSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'answered'],
-      default: 'pending',
+      enum: ['open', 'answered', 'closed'],
+      default: 'open',
     },
 
     createdAt: {
@@ -56,7 +61,8 @@ const Question = mongoose.model('Question', QuestionSchema);
 function validateQuestion(question) {
   const schema = Joi.object({
     questionText: Joi.string().min(5).max(500).required(),
-    petName: Joi.string().min(2).max(50).required(),
+    petName: Joi.string().min(2).max(50).allow('').optional(),
+    petId: Joi.string().optional(),
     vetId: Joi.string().required(),
   });
 
@@ -68,6 +74,8 @@ function validateQuestion(question) {
 function validateUpdateQuestion(question) {
   const schema = Joi.object({
     questionText: Joi.string().min(5).max(500).required(),
+    petName: Joi.string().min(2).max(50).allow('').optional(),
+    petId: Joi.string().optional(),
   });
 
   return schema.validate(question);
