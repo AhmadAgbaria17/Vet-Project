@@ -18,10 +18,10 @@ import AddMedicalRecord from '../screens/VetApp/CustomersFeature/AddMedicalRecor
 import VetQnAScreen from '../screens/VetApp/QnAFeature/VetQnAScreen';
 
 // Import client screens
-import NearbyVetsScreen from '../screens/ClientApp/NearbyVetsScreen';
-import MyPetsScreen from '../screens/ClientApp/MyPetsScreen';
-import AppointmentsScreen from '../screens/ClientApp/AppointmentsScreen';
-import AskVetScreen from '../screens/ClientApp/AskVetScreen';
+import NearbyVetsScreen from '../screens/ClientApp/NearbyClincsFeature/NearbyVetsScreen';
+import MyPetsScreen from '../screens/ClientApp/MyPetsFeature/MyPetsScreen';
+import AppointmentsScreen from '../screens/ClientApp/AppointmentsFeature/AppointmentsScreen';
+import AskVetScreen from '../screens/ClientApp/QnAFeature/AskVetScreen';
 import { RootDrawerParamList } from './types';
 
 

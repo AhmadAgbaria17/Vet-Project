@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
-import Header from '../../components/Header';
-import { Clinic, Pet, Question } from '../../interfaces/types';
+import Header from '../../../components/Header';
+import { Clinic, Pet, Question } from '../../../interfaces/types';
 import axios from 'axios';
 
 interface VetOption {
