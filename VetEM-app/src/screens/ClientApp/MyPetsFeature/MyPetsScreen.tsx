@@ -9,7 +9,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import Header from '../../components/Header';
+import Header from '../../../components/Header';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 

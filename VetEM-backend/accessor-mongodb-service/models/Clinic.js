@@ -26,10 +26,6 @@ const ClinicSchema = new Schema
       message: "Invalid openTime format. Use HH:MM-HH:MM (e.g., 14:00-19:00)"
     }
   },
-  contactInfo: {
-    type: String,
-    default: ""
-  },
   location: {
     latitude: {
       type: Number,

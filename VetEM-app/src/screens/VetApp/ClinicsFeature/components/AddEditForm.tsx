@@ -75,7 +75,7 @@ const AddEditForm = ({
       if (!token) return;
 
       await axios.post(
-        `http://192.168.10.126:5000/mongodb/clinics`,
+        `http://192.168.10.126:5000/mongodb/clinic`,
         newClinic,
         {
           headers: {

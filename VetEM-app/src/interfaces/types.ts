@@ -62,6 +62,7 @@ export interface Clinic {
   _id?: string;
   name: string;
   openTime: string;
+  distanceKm?: number;
   location: { latitude: number; longitude: number };
   userId?: string | (UserInfo & { email?: string; phone?: string });
 }

@@ -3,22 +3,13 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-nat
 import Header from '../../../components/Header';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { Clinic } from '../../../interfaces/types';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 interface NearbyVetsScreenProps {
   navigation: any;
-}
-
-interface Clinic {
-  _id: string;
-  name: string;
-  openTime: string;
-  distanceKm?: number;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
 }
 
 const NearbyVetsScreen = ({ navigation }: NearbyVetsScreenProps) => {
@@ -40,7 +31,13 @@ const NearbyVetsScreen = ({ navigation }: NearbyVetsScreenProps) => {
         let location = await Location.getCurrentPositionAsync({});
         setUserLocation(location);
 
+        const token = await AsyncStorage.getItem('authToken');
+         if (!token) return;
+
         const response = await axios.get('http://192.168.10.126:5000/mongodb/clinics', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           params: {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
@@ -98,7 +95,7 @@ const NearbyVetsScreen = ({ navigation }: NearbyVetsScreenProps) => {
                       longitude: clinic.location.longitude,
                     }}
                     title={clinic.name}
-                    description={`Open: ${clinic.openTime}`}
+                    description={`Open: ${clinic.openTime}${getVetName(clinic) ? ` | Dr. ${getVetName(clinic)}` : ''}`}
                   />
                 ))}
               </MapView>
@@ -108,9 +105,15 @@ const NearbyVetsScreen = ({ navigation }: NearbyVetsScreenProps) => {
               {clinics.map((clinic) => (
                 <View key={clinic._id} style={styles.clinicCard}>
                   <Text style={styles.clinicName}>{clinic.name}</Text>
-                  <Text>Opening Hours: {clinic.openTime}</Text>
+                  <Text style={styles.clinicInfo}>Opening Hours: {clinic.openTime}</Text>
+                  {getVetName(clinic) && (
+                    <Text style={styles.clinicInfo}>Vet Doctor: Dr. {getVetName(clinic)}</Text>
+                  )}
+                  {getVetContact(clinic) && (
+                    <Text style={styles.clinicInfo}>Contact: {getVetContact(clinic)}</Text>
+                  )}
                   {clinic.distanceKm !== undefined && (
-                    <Text>{clinic.distanceKm} km away</Text>
+                    <Text style={styles.clinicInfo}>{clinic.distanceKm} km away</Text>
                   )}
                 </View>
               ))}
@@ -120,6 +123,16 @@ const NearbyVetsScreen = ({ navigation }: NearbyVetsScreenProps) => {
       </ScrollView>
     </View>
   );
+};
+
+const getVetName = (clinic: Clinic) => {
+  if (!clinic.userId || typeof clinic.userId === 'string') return '';
+  return `${clinic.userId.firstName} ${clinic.userId.lastName}`.trim();
+};
+
+const getVetContact = (clinic: Clinic) => {
+  if (!clinic.userId || typeof clinic.userId === 'string') return '';
+  return clinic.userId.phone || clinic.userId.email || '';
 };
 
 const styles = StyleSheet.create({
@@ -159,6 +172,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  clinicInfo: {
+    color: '#555',
+    marginBottom: 4,
   },
 });
 
